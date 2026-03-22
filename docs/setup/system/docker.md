@@ -1,9 +1,9 @@
 # Docker
 
-You can use docker to compile the project as well.  Note that the Dockerfiles in the project often fall out of maitenance because no one on the main development team uses them.
+You can use docker to compile the project as well.  Note that the Dockerfiles in the project often fall out of maitenance because no one on the main development team uses them, when this is noticed, they are deleted.
 
 ```sh
-docker build -f docker/Ubuntu/Dockerfile -t jak .
+docker build -f docker/Ubuntu-20.04.Dockerfile -t jak .
 ```
 
 This will create an image with all required dependencies and already built.
