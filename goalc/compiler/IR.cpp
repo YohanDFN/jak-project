@@ -418,6 +418,7 @@ void IR_GotoLabel::do_codegen_x86(emitter::ObjectGenerator* gen,
                                   emitter::IR_Record irec) {
   (void)allocs;
   auto instr = gen->add_instr(IGen::jmp_32(*gen), irec);
+  // TODO ARM - have to patch this differently, encoding for the immediate is different
   gen->link_instruction_jump(instr, gen->get_future_ir_record_in_same_func(irec, m_dest->idx));
 }
 

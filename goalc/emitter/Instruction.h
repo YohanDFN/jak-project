@@ -91,6 +91,9 @@ struct InstructionARM64 : InstructionImpl<InstructionARM64> {
   }
 
   uint8_t emit(uint8_t* buffer) const {
+    if (encoding == 0) {
+      return 0;
+    }
     memcpy(buffer, &encoding, 4);
     return 4;
   }

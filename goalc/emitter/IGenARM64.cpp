@@ -22,25 +22,37 @@ const auto instr_set = emitter::InstructionSet::ARM64;
 using namespace emitter::ARM64;
 
 InstructionARM64 mov_gpr64_gpr64(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+  // https://www.scs.stanford.edu/~zyedidia/arm64/mov_orr_log_shift.html
+  // sf	0	1	0	1	0	1	0	0	0	0	Rm	0
+  // 0	0	0	0	0	1	1	1	1	1	Rd MOV <Xd>, <Xm>
+  ASSERT(dst.is_gpr(instr_set));
+  ASSERT(src.is_gpr(instr_set));
+  return InstructionARM64(Base(0b10101010000, 11), Rm(src.id()), Rn(0b11111), Rd(dst.id()),
+                          Imm6(0));
 }
 
 InstructionARM64 mov_gpr64_u64(Register dst, uint64_t val) {
+  // TODO - cannot be done in a single arm64 instruction
+  // multiple https://www.scs.stanford.edu/~zyedidia/arm64/movk.html are needed
   ASSERT_MSG(false, "not yet implemented");
   return InstructionARM64(0b0);
 }
 
 InstructionARM64 mov_gpr64_u32(Register dst, uint64_t val) {
+  // TODO - cannot be done in a single arm64 instruction
+  // multiple https://www.scs.stanford.edu/~zyedidia/arm64/movk.html are needed
   ASSERT_MSG(false, "not yet implemented");
   return InstructionARM64(0b0);
 }
 
 InstructionARM64 mov_gpr64_s32(Register dst, int64_t val) {
+  // TODO - cannot be done in a single arm64 instruction
+  // multiple https://www.scs.stanford.edu/~zyedidia/arm64/movk.html are needed
   ASSERT_MSG(false, "not yet implemented");
   return InstructionARM64(0b0);
 }
 
+// TODO - should these be make generic to simdX?
 InstructionARM64 movd_gpr32_xmm32(Register dst, Register src) {
   ASSERT_MSG(false, "not yet implemented");
   return InstructionARM64(0b0);
@@ -74,11 +86,18 @@ InstructionARM64 mov_xmm32_xmm32(Register dst, Register src) {
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 InstructionARM64 load8s_gpr64_gpr64_plus_gpr64(Register dst, Register addr1, Register addr2) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+  // https://www.scs.stanford.edu/~zyedidia/arm64/ldrsb_reg.html
+  // 64-bit with extended register offset (opc == 10 && option != 011)
+  // LDRSB <Xt>, [<Xn|SP>, (<Wm>|<Xm>), <extend> {<amount>}]
+  ASSERT(dst.is_gpr(instr_set));
+  ASSERT(addr1.is_gpr(instr_set));
+  ASSERT(addr2.is_gpr(instr_set));
+  return InstructionARM64(Base(0b0011100010100000111010, 22), Rt(dst.id()), Rn(addr1.id()),
+                          Rm(addr2.id()));
 }
 
 InstructionARM64 store8_gpr64_gpr64_plus_gpr64(Register addr1, Register addr2, Register value) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/strb_reg.html
   ASSERT_MSG(false, "not yet implemented");
   return InstructionARM64(0b0);
 }
@@ -615,14 +634,18 @@ InstructionARM64 pop_gpr64(Register reg) {
                           Rt(reg.id()));
 }
 
-InstructionARM64 call_r64(Register reg_) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 call_r64(Register reg) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/blr.html
+  // BLR <Xn>
+  ASSERT(reg.is_gpr(instr_set));
+  return InstructionARM64(Base(0b1101011000111111000000, 22), Rn(reg.id()));
 }
 
-InstructionARM64 jmp_r64(Register reg_) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 jmp_r64(Register reg) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/br.html
+  // BR <Xn>
+  ASSERT(reg.is_gpr(instr_set));
+  return InstructionARM64(Base(0b1101011000011111000000, 22), Rn(reg.id()));
 }
 
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -711,8 +734,12 @@ InstructionARM64 unsigned_div_gpr32(Register reg) {
 }
 
 InstructionARM64 cdq() {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/asr_asrv.html
+  // asr x3, x0, #63
+  // (using X3 = edx and X0 = eax)
   ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+  return InstructionARM64(Base(0b1001101011000000001010, 22), Rm(63), Rn(ARM64_REG::X0),
+                          Rd(ARM64_REG::X3));
 }
 
 InstructionARM64 movsx_r64_r32(Register dst, Register src) {
@@ -897,8 +924,9 @@ InstructionARM64 float_to_int32(Register dst, Register src) {
 }
 
 InstructionARM64 nop() {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+  // https://www.scs.stanford.edu/~zyedidia/arm64/nop.html
+  // nop
+  return InstructionARM64(Base(0b11010101000000110010000000011111, 32));
 }
 
 // TODO - rsqrt / abs / sqrt
@@ -908,7 +936,8 @@ InstructionARM64 nop() {
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 InstructionARM64 null() {
-  ASSERT_MSG(false, "not yet implemented");
+  // https://www.scs.stanford.edu/~zyedidia/arm64/nop.html
+  // nop
   return InstructionARM64(0b0);
 }
 
