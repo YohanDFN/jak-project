@@ -61,45 +61,87 @@ constexpr Field Rm(u32 x) {
 }
 
 constexpr Field Imm6(u32 x) {
+  ASSERT(x >= 0 && x <= ((2 ^ 6) - 1));
   return Field{(x & 0b111111) << 10};
 }
 
 constexpr Field Imm9(s32 x) {
+  ASSERT(x >= 0 && x <= ((2 ^ 9) - 1));
   return Field{(static_cast<uint32_t>(x) & 0b111111111) << 12};
 }
 
 constexpr Field Imm12(u32 x) {
-  ASSERT(x >= 0 && x <= 4095);
+  ASSERT(x >= 0 && x <= ((2 ^ 12) - 1));
   return Field{(static_cast<uint32_t>(x) & 0b111111111111) << 10};
+}
+
+constexpr Field Imms(u32 x) {
+  ASSERT(x >= 0 && x <= ((2 ^ 6) - 1));
+  return Field{(static_cast<uint32_t>(x) & 0b111111) << 10};
+}
+
+constexpr Field Immr(u32 x) {
+  ASSERT(x >= 0 && x <= ((2 ^ 6) - 1));
+  return Field{(static_cast<uint32_t>(x) & 0b111111) << 16};
 }
 }  // namespace ARM64
 
 struct InstructionARM64 : InstructionImpl<InstructionARM64> {
-  // The ARM instruction stream is a sequence of word-aligned words. Each ARM instruction is a
-  // single 32-bit word in that stream.
-  // Info:
-  // - https://yurichev.com/mirrors/ARMv8-A_Architecture_Reference_Manual_(Issue_A.a).pdf
-  // - https://www.scs.stanford.edu/~zyedidia/arm64/
-  // - https://armconverter.com/?lock=arm64&code=STR+X0,+[SP,+%23-8]!
-  u32 encoding;
+  // The ARM instruction stream is a sequence of word-aligned words.
+  // Each ARM instruction is a single 32-bit word in that stream.
+  //
+  // Some x86 instructions are not possible to represent in ARM in a single instruction
+  // however, in order to not have to overhaul things at the IR level,
+  // it feels preferably to instead allow an instruction to emit multiple instructions if needed
+  //
+  // To do so, the instruction can optionally include multiple encodings
+  // all of which are emitted at once.
+  static constexpr int kMaxInstrs = 4;
+
+  u32 encodings[kMaxInstrs]{};
+  uint8_t count = 0;
 
   InstructionARM64() = delete;
+
+  // --- single instruction ---
   template <typename... Fs>
-  constexpr InstructionARM64(uint32_t base, Fs... fields) : encoding((base | ... | fields.bits)) {
-    static_assert((std::is_same_v<Fs, emitter::ARM64::Field> && ...),
-                  "All operands must be Field types");
+  constexpr InstructionARM64(uint32_t base, Fs... fields) {
+    static_assert((std::is_same_v<Fs, emitter::ARM64::Field> && ...));
+    encodings[0] = (base | ... | fields.bits);
+    count = 1;
+  }
+
+  // --- multi instruction (variadic) ---
+  template <typename... Instrs>
+  constexpr InstructionARM64(const Instrs&... instrs)
+    requires(std::is_same_v<Instrs, InstructionARM64> && ...)
+  {
+    uint8_t idx = 0;
+    auto append = [&](const InstructionARM64& i) {
+      for (uint8_t j = 0; j < i.count; ++j) {
+        encodings[idx++] = i.encodings[j];
+      }
+    };
+    (append(instrs), ...);
+    count = idx;
   }
 
   uint8_t emit(uint8_t* buffer) const {
-    if (encoding == 0) {
+    if (count == 1 && encodings[0] == 0) {
       return 0;
     }
-    memcpy(buffer, &encoding, 4);
-    return 4;
+    memcpy(buffer, encodings, count * 4);
+    return count * 4;
   }
 
-  uint8_t length() const { return 4; }
+  uint8_t length() const {
+    if (count == 1 && encodings[0] == 0) {
+      return 0;
+    }
+    return count * 4;
+  }
 
+  // TODO ARM - all placeholders, no idea if this is even relevant, if not, get rid of it all
   int get_imm_size() const { return 0; }
 
   int offset_of_imm() const { return 0; }

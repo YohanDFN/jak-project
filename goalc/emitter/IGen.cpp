@@ -693,12 +693,12 @@ Instruction not_gpr64(const ObjectGenerator& gen, Register reg) {
   IGEN_DISPATCH(not_gpr64, reg);
 }
 
-Instruction shl_gpr64_cl(const ObjectGenerator& gen, Register reg) {
-  IGEN_DISPATCH(shl_gpr64_cl, reg);
+Instruction shl_gpr64_reg(const ObjectGenerator& gen, Register reg) {
+  IGEN_DISPATCH(shl_gpr64_reg, reg);
 }
 
-Instruction shr_gpr64_cl(const ObjectGenerator& gen, Register reg) {
-  IGEN_DISPATCH(shr_gpr64_cl, reg);
+Instruction shr_gpr64_reg(const ObjectGenerator& gen, Register reg) {
+  IGEN_DISPATCH(shr_gpr64_reg, reg);
 }
 
 Instruction sar_gpr64_cl(const ObjectGenerator& gen, Register reg) {

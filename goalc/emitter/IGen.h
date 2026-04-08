@@ -618,19 +618,21 @@ Instruction not_gpr64(const ObjectGenerator& gen, Register reg);
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 /*!
- * Shift 64-bit gpr left by CL register
+ * Shift 64-bit gpr left by a shift amount in a register (ie. forced to be CL register on x86)
  */
-Instruction shl_gpr64_cl(const ObjectGenerator& gen, Register reg);
+Instruction shl_gpr64_reg(const ObjectGenerator& gen, Register reg, Register shift_reg);
 
 /*!
- * Shift 64-bit gpr right (logical) by CL register
+ * Shift 64-bit gpr right (logical) by a shift amount in a register (ie. forced to be CL register on
+ * x86)
  */
-Instruction shr_gpr64_cl(const ObjectGenerator& gen, Register reg);
+Instruction shr_gpr64_reg(const ObjectGenerator& gen, Register reg, Register shift_reg);
 
 /*!
- * Shift 64-bit gpr right (arithmetic) by CL register
+ * Shift 64-bit gpr right (arithmetic) a shift amount in a register (ie. forced to be CL register on
+ * x86)
  */
-Instruction sar_gpr64_cl(const ObjectGenerator& gen, Register reg);
+Instruction sar_gpr64_reg(const ObjectGenerator& gen, Register reg, Register shift_reg);
 
 /*!
  * Shift 64-ptr left (logical) by the constant shift amount "sa".

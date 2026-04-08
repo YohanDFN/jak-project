@@ -712,15 +712,18 @@ void IR_IntegerMath::do_codegen_x86(emitter::ObjectGenerator* gen,
       ASSERT(!m_arg);
       break;
     case IntegerMathKind::SHLV_64:
-      gen->add_instr(IGen::shl_gpr64_cl(*gen, get_reg(m_dest, allocs, irec)), irec);
+      gen->add_instr(IGen::shl_gpr64_reg(*gen, get_reg(m_dest, allocs, irec)), irec);
+      // TODO ARM - x86 forces you to use CL, which is dumb, but the register allocator
+      // has that logic baked in somewhere
+      // ARM has no such constraint, so we should be able to use any register for the shift amount
       ASSERT(get_reg(m_arg, allocs, irec) == emitter::RCX);
       break;
     case IntegerMathKind::SHRV_64:
-      gen->add_instr(IGen::shr_gpr64_cl(*gen, get_reg(m_dest, allocs, irec)), irec);
+      gen->add_instr(IGen::shr_gpr64_reg(*gen, get_reg(m_dest, allocs, irec)), irec);
       ASSERT(get_reg(m_arg, allocs, irec) == emitter::RCX);
       break;
     case IntegerMathKind::SARV_64:
-      gen->add_instr(IGen::sar_gpr64_cl(*gen, get_reg(m_dest, allocs, irec)), irec);
+      gen->add_instr(IGen::sar_gpr64_reg(*gen, get_reg(m_dest, allocs, irec)), irec);
       ASSERT(get_reg(m_arg, allocs, irec) == emitter::RCX);
       break;
     case IntegerMathKind::SHL_64:

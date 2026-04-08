@@ -477,19 +477,21 @@ InstructionX86 not_gpr64(Register reg);
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 /*!
- * Shift 64-bit gpr left by CL register
+ * Shift 64-bit gpr left by a shift amount in a register (ie. forced to be CL register on x86)
  */
-InstructionX86 shl_gpr64_cl(Register reg);
+InstructionX86 shl_gpr64_reg(Register reg, Register shift_reg);
 
 /*!
- * Shift 64-bit gpr right (logical) by CL register
+ * Shift 64-bit gpr right (logical) by a shift amount in a register (ie. forced to be CL register on
+ * x86)
  */
-InstructionX86 shr_gpr64_cl(Register reg);
+InstructionX86 shr_gpr64_reg(Register reg, Register shift_reg);
 
 /*!
- * Shift 64-bit gpr right (arithmetic) by CL register
+ * Shift 64-bit gpr right (arithmetic) a shift amount in a register (ie. forced to be CL register on
+ * x86)
  */
-InstructionX86 sar_gpr64_cl(Register reg);
+InstructionX86 sar_gpr64_reg(Register reg, Register shift_reg);
 
 /*!
  * Shift 64-ptr left (logical) by the constant shift amount "sa".

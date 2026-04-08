@@ -1569,21 +1569,24 @@ InstructionX86 not_gpr64(Register reg) {
   return instr;
 }
 
-InstructionX86 shl_gpr64_cl(Register reg) {
+InstructionX86 shl_gpr64_reg(Register reg, Register _) {
+  // x86 is forced to use CL
   ASSERT(reg.is_gpr(instr_set));
   InstructionX86 instr(0xd3);
   instr.set_modrm_and_rex(4, reg.hw_id(instr_set), 3, true);
   return instr;
 }
 
-InstructionX86 shr_gpr64_cl(Register reg) {
+InstructionX86 shr_gpr64_reg(Register reg, Register _) {
+  // x86 is forced to use CL
   ASSERT(reg.is_gpr(instr_set));
   InstructionX86 instr(0xd3);
   instr.set_modrm_and_rex(5, reg.hw_id(instr_set), 3, true);
   return instr;
 }
 
-InstructionX86 sar_gpr64_cl(Register reg) {
+InstructionX86 sar_gpr64_reg(Register reg, Register _) {
+  // x86 is forced to use CL
   ASSERT(reg.is_gpr(instr_set));
   InstructionX86 instr(0xd3);
   instr.set_modrm_and_rex(7, reg.hw_id(instr_set), 3, true);
