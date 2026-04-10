@@ -849,114 +849,189 @@ InstructionARM64 sar_gpr64_u8(Register reg, uint8_t sa) {
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 //   CONTROL FLOW
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+//
+// All of these instructions jump to a target that is zero
+// and then its up to the IR to patch the actual target
+//
+// Critically, on arm these relative targets must be within
+// 128MB, which is much less than x86 (~2GB)
+//
+// However, these functions are only really used for jumps within
+// a given function...of which the largest we've seen isn't even in the MB
+// of sizes
+//
+// So for now, keep it simple and don't implement something more
+// complicated like veneers, this should be fine.
 
-InstructionARM64 jmp_32() {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 jmp_imm() {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/b_uncond.html
+  // B <label>
+  return InstructionARM64(Base(0b000101, 6), Imm26(0));
 }
 
-InstructionARM64 je_32() {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+// Now these instructions in ARM are even more limiting, conditional
+// branches must be within 1MB relative to the instruction
+//
+// However once again, that is still WAY below our biggest functions of a few kb
+//
+// But still...be aware!  There should be some assertions in place in the patching so that
+// said issues don't just fly under the radar
+//
+// Also, these instructions may have to be patched slightly differently since
+// ARM uses a single branch instruction for all
+//
+// It's worth noting that these x86 instructions also have limitations, they cannot
+// jump to far labels (labels in other code segments).  But that's more difficult to
+// give a numeric value to like with ARM.
+
+InstructionARM64 je_imm() {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/b_cond.html
+  // B.<cond> <label>
+  // 0000 	EQ
+  return InstructionARM64(Base(0b01010100, 8), Imm19(0), Cond(0b0000));
 }
 
-InstructionARM64 jne_32() {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 jne_imm() {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/b_cond.html
+  // B.<cond> <label>
+  // 0001 	NE
+  return InstructionARM64(Base(0b01010100, 8), Imm19(0), Cond(0b0001));
 }
 
-InstructionARM64 jle_32() {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 jle_imm() {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/b_cond.html
+  // B.<cond> <label>
+  // 1101 	LE
+  return InstructionARM64(Base(0b01010100, 8), Imm19(0), Cond(0b1101));
 }
 
-InstructionARM64 jge_32() {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 jge_imm() {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/b_cond.html
+  // B.<cond> <label>
+  // 1010 	GE
+  return InstructionARM64(Base(0b01010100, 8), Imm19(0), Cond(0b1010));
 }
 
-InstructionARM64 jl_32() {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 jl_imm() {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/b_cond.html
+  // B.<cond> <label>
+  // 1011 	LT
+  return InstructionARM64(Base(0b01010100, 8), Imm19(0), Cond(0b1011));
 }
 
-InstructionARM64 jg_32() {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 jg_imm() {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/b_cond.html
+  // B.<cond> <label>
+  // 1100 	GT
+  return InstructionARM64(Base(0b01010100, 8), Imm19(0), Cond(0b1100));
 }
 
-InstructionARM64 jbe_32() {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 jbe_imm() {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/b_cond.html
+  // B.<cond> <label>
+  // 1001 	LS
+  return InstructionARM64(Base(0b01010100, 8), Imm19(0), Cond(0b1001));
 }
 
-InstructionARM64 jae_32() {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 jae_imm() {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/b_cond.html
+  // B.<cond> <label>
+  // 0010 	CS
+  return InstructionARM64(Base(0b01010100, 8), Imm19(0), Cond(0b0010));
 }
 
-InstructionARM64 jb_32() {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 jb_imm() {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/b_cond.html
+  // B.<cond> <label>
+  // 0011 	CC
+  return InstructionARM64(Base(0b01010100, 8), Imm19(0), Cond(0b0011));
 }
 
-InstructionARM64 ja_32() {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 ja_imm() {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/b_cond.html
+  // B.<cond> <label>
+  // 1000 	HI
+  return InstructionARM64(Base(0b01010100, 8), Imm19(0), Cond(0b1000));
 }
 
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 //   FLOAT MATH
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-InstructionARM64 cmp_flt_flt(Register a, Register b) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 cmp_f32_f32(Register a, Register b) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/fcmp_float.html
+  // Single-precision (ftype == 00 && opc == 00)
+  // FCMP <Sn>, <Sm>
+  return InstructionARM64(Base(0b00011110001000000010000000000000, 32), Rn(a.id()), Rm(b.id()));
 }
 
-InstructionARM64 sqrts_xmm(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 sqrt_f32(Register dst, Register src) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/fsqrt_float.html
+  // Single-precision (ftype == 00)
+  // FSQRT <Sd>, <Sn>
+  return InstructionARM64(Base(0b0001111000100001110000, 22), Rn(src.id()), Rm(dst.id()));
 }
 
-InstructionARM64 mulss_xmm_xmm(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 mul_f32_f32(Register dst, Register src) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/fmul_float.html
+  // Single-precision (ftype == 00)
+  // FMUL <Sd>, <Sn>, <Sm>
+  return InstructionARM64(Base(0b0001111000100000000010, 22), Rd(dst.id()), Rn(dst.id()),
+                          Rm(src.id()));
 }
 
-InstructionARM64 divss_xmm_xmm(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 div_f32_f32(Register dst, Register src) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/fdiv_float.html
+  // Single-precision (ftype == 00)
+  // FDIV <Sd>, <Sn>, <Sm>
+  return InstructionARM64(Base(0b0001111000100000000110, 22), Rd(dst.id()), Rn(dst.id()),
+                          Rm(src.id()));
 }
 
-InstructionARM64 subss_xmm_xmm(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 sub_f32_f32(Register dst, Register src) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/fsub_float.html
+  // Single-precision (ftype == 00)
+  // FSUB <Sd>, <Sn>, <Sm>
+  return InstructionARM64(Base(0b0001111000100000001110, 22), Rd(dst.id()), Rn(dst.id()),
+                          Rm(src.id()));
 }
 
-InstructionARM64 addss_xmm_xmm(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 add_f32_f32(Register dst, Register src) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/fadd_float.html
+  // Single-precision (ftype == 00)
+  // FADD <Sd>, <Sn>, <Sm>
+  return InstructionARM64(Base(0b0001111000100000001010, 22), Rd(dst.id()), Rn(dst.id()),
+                          Rm(src.id()));
 }
 
-InstructionARM64 minss_xmm_xmm(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 min_f32_f32(Register dst, Register src) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/fmin_float.html
+  // Single-precision (ftype == 00)
+  // FMIN <Sd>, <Sn>, <Sm>
+  return InstructionARM64(Base(0b0001111000100000010110, 22), Rd(dst.id()), Rn(dst.id()),
+                          Rm(src.id()));
 }
 
-InstructionARM64 maxss_xmm_xmm(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 max_f32_f32(Register dst, Register src) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/fmax_float.html
+  // Single-precision (ftype == 00)
+  // FMAX <Sd>, <Sn>, <Sm>
+  return InstructionARM64(Base(0b0001111000100000010010, 22), Rd(dst.id()), Rn(dst.id()),
+                          Rm(src.id()));
 }
 
-InstructionARM64 int32_to_float(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 int32_to_f32(Register dst, Register src) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/scvtf_float_int.html
+  // 32-bit to single-precision (sf == 0 && ftype == 00)
+  // SCVTF <Sd>, <Wn>
+  return InstructionARM64(Base(0b0001111000100010000000, 22), Rd(dst.id()), Rn(dst.id()));
 }
 
-InstructionARM64 float_to_int32(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 f32_to_int32(Register dst, Register src) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/fcvtzs_float_int.html
+  // 32-bit to single-precision (sf == 0 && ftype == 00)
+  // FCVTZS <Wd>, <Sn>
+  return InstructionARM64(Base(0b0001111000111000000000, 22), Rd(dst.id()), Rn(dst.id()));
 }
 
 InstructionARM64 nop() {

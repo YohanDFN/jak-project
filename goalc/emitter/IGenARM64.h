@@ -515,57 +515,57 @@ InstructionARM64 sar_gpr64_u8(Register reg, uint8_t sa);
 /*!
  * Jump, 32-bit constant offset.  The offset is by default 0 and must be patched later.
  */
-InstructionARM64 jmp_32();
+InstructionARM64 jmp_imm();
 
 /*!
  * Jump if equal.
  */
-InstructionARM64 je_32();
+InstructionARM64 je_imm();
 
 /*!
  * Jump not equal.
  */
-InstructionARM64 jne_32();
+InstructionARM64 jne_imm();
 
 /*!
  * Jump less than or equal.
  */
-InstructionARM64 jle_32();
+InstructionARM64 jle_imm();
 
 /*!
  * Jump greater than or equal.
  */
-InstructionARM64 jge_32();
+InstructionARM64 jge_imm();
 
 /*!
  * Jump less than
  */
-InstructionARM64 jl_32();
+InstructionARM64 jl_imm();
 
 /*!
  * Jump greater than
  */
-InstructionARM64 jg_32();
+InstructionARM64 jg_imm();
 
 /*!
  * Jump below or equal
  */
-InstructionARM64 jbe_32();
+InstructionARM64 jbe_imm();
 
 /*!
  * Jump above or equal
  */
-InstructionARM64 jae_32();
+InstructionARM64 jae_imm();
 
 /*!
  * Jump below
  */
-InstructionARM64 jb_32();
+InstructionARM64 jb_imm();
 
 /*!
  * Jump above
  */
-InstructionARM64 ja_32();
+InstructionARM64 ja_imm();
 
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 //   FLOAT MATH
@@ -574,49 +574,49 @@ InstructionARM64 ja_32();
 /*!
  * Compare two floats and set flag register for jump (ucomiss)
  */
-InstructionARM64 cmp_flt_flt(Register a, Register b);
+InstructionARM64 cmp_f32_f32(Register a, Register b);
 
-InstructionARM64 sqrts_xmm(Register dst, Register src);
+InstructionARM64 sqrt_f32(Register dst, Register src);
 
 /*!
  * Multiply two floats in xmm's
  */
-InstructionARM64 mulss_xmm_xmm(Register dst, Register src);
+InstructionARM64 mul_f32_f32(Register dst, Register src);
 
 /*!
  * Divide two floats in xmm's
  */
-InstructionARM64 divss_xmm_xmm(Register dst, Register src);
+InstructionARM64 div_f32_f32(Register dst, Register src);
 
 /*!
  * Subtract two floats in xmm's
  */
-InstructionARM64 subss_xmm_xmm(Register dst, Register src);
+InstructionARM64 sub_f32_f32(Register dst, Register src);
 
 /*!
  * Add two floats in xmm's
  */
-InstructionARM64 addss_xmm_xmm(Register dst, Register src);
+InstructionARM64 add_f32_f32(Register dst, Register src);
 
 /*!
  * Floating point minimum.
  */
-InstructionARM64 minss_xmm_xmm(Register dst, Register src);
+InstructionARM64 min_f32_f32(Register dst, Register src);
 
 /*!
  * Floating point maximum.
  */
-InstructionARM64 maxss_xmm_xmm(Register dst, Register src);
+InstructionARM64 max_f32_f32(Register dst, Register src);
 
 /*!
  * Convert GPR int32 to XMM float (single precision)
  */
-InstructionARM64 int32_to_float(Register dst, Register src);
+InstructionARM64 int32_to_f32(Register dst, Register src);
 
 /*!
  * Convert XMM float to GPR int32(single precision) (truncate)
  */
-InstructionARM64 float_to_int32(Register dst, Register src);
+InstructionARM64 f32_to_int32(Register dst, Register src);
 
 InstructionARM64 nop();
 

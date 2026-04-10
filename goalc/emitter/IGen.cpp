@@ -718,87 +718,87 @@ Instruction sar_gpr64_u8(const ObjectGenerator& gen, Register reg, uint8_t sa) {
 }
 
 Instruction jmp_32(const ObjectGenerator& gen) {
-  IGEN_DISPATCH(jmp_32);
+  IGEN_DISPATCH(jmp_imm);
 }
 
 Instruction je_32(const ObjectGenerator& gen) {
-  IGEN_DISPATCH(je_32);
+  IGEN_DISPATCH(je_imm);
 }
 
 Instruction jne_32(const ObjectGenerator& gen) {
-  IGEN_DISPATCH(jne_32);
+  IGEN_DISPATCH(jne_imm);
 }
 
 Instruction jle_32(const ObjectGenerator& gen) {
-  IGEN_DISPATCH(jle_32);
+  IGEN_DISPATCH(jle_imm);
 }
 
 Instruction jge_32(const ObjectGenerator& gen) {
-  IGEN_DISPATCH(jge_32);
+  IGEN_DISPATCH(jge_imm);
 }
 
 Instruction jl_32(const ObjectGenerator& gen) {
-  IGEN_DISPATCH(jl_32);
+  IGEN_DISPATCH(jl_imm);
 }
 
 Instruction jg_32(const ObjectGenerator& gen) {
-  IGEN_DISPATCH(jg_32);
+  IGEN_DISPATCH(jg_imm);
 }
 
 Instruction jbe_32(const ObjectGenerator& gen) {
-  IGEN_DISPATCH(jbe_32);
+  IGEN_DISPATCH(jbe_imm);
 }
 
 Instruction jae_32(const ObjectGenerator& gen) {
-  IGEN_DISPATCH(jae_32);
+  IGEN_DISPATCH(jae_imm);
 }
 
 Instruction jb_32(const ObjectGenerator& gen) {
-  IGEN_DISPATCH(jb_32);
+  IGEN_DISPATCH(jb_imm);
 }
 
 Instruction ja_32(const ObjectGenerator& gen) {
-  IGEN_DISPATCH(ja_32);
+  IGEN_DISPATCH(ja_imm);
 }
 
 Instruction cmp_flt_flt(const ObjectGenerator& gen, Register a, Register b) {
-  IGEN_DISPATCH(cmp_flt_flt, a, b);
+  IGEN_DISPATCH(cmp_f32_f32, a, b);
 }
 
 Instruction sqrts_xmm(const ObjectGenerator& gen, Register dst, Register src) {
-  IGEN_DISPATCH(sqrts_xmm, dst, src);
+  IGEN_DISPATCH(sqrt_f32, dst, src);
 }
 
 Instruction mulss_xmm_xmm(const ObjectGenerator& gen, Register dst, Register src) {
-  IGEN_DISPATCH(mulss_xmm_xmm, dst, src);
+  IGEN_DISPATCH(mul_f32_f32, dst, src);
 }
 
 Instruction divss_xmm_xmm(const ObjectGenerator& gen, Register dst, Register src) {
-  IGEN_DISPATCH(divss_xmm_xmm, dst, src);
+  IGEN_DISPATCH(div_f32_f32, dst, src);
 }
 
 Instruction subss_xmm_xmm(const ObjectGenerator& gen, Register dst, Register src) {
-  IGEN_DISPATCH(subss_xmm_xmm, dst, src);
+  IGEN_DISPATCH(sub_f32_f32, dst, src);
 }
 
 Instruction addss_xmm_xmm(const ObjectGenerator& gen, Register dst, Register src) {
-  IGEN_DISPATCH(addss_xmm_xmm, dst, src);
+  IGEN_DISPATCH(add_f32_f32, dst, src);
 }
 
 Instruction minss_xmm_xmm(const ObjectGenerator& gen, Register dst, Register src) {
-  IGEN_DISPATCH(minss_xmm_xmm, dst, src);
+  IGEN_DISPATCH(min_f32_f32, dst, src);
 }
 
 Instruction maxss_xmm_xmm(const ObjectGenerator& gen, Register dst, Register src) {
-  IGEN_DISPATCH(maxss_xmm_xmm, dst, src);
+  IGEN_DISPATCH(max_f32_f32, dst, src);
 }
 
 Instruction int32_to_float(const ObjectGenerator& gen, Register dst, Register src) {
-  IGEN_DISPATCH(int32_to_float, dst, src);
+  IGEN_DISPATCH(int32_to_f32, dst, src);
 }
 
 Instruction float_to_int32(const ObjectGenerator& gen, Register dst, Register src) {
-  IGEN_DISPATCH(float_to_int32, dst, src);
+  IGEN_DISPATCH(f32_to_int32, dst, src);
 }
 
 Instruction nop(const ObjectGenerator& gen) {
