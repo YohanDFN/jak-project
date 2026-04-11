@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstring>
+#include <span>
 #include <variant>
 
 #include "common/common_types.h"
@@ -44,19 +45,33 @@ constexpr u32 Base(u32 value, u32 width) {
   return value << (32 - width);
 }
 
+constexpr Field Sh(u32 x) {
+  ASSERT(x >= 0 && x <= ((2 ^ 1) - 1));
+  return Field{(x & 1) << 22};
+}
+
+constexpr Field Shift(u32 x) {
+  ASSERT(x >= 0 && x <= ((2 ^ 2) - 1));
+  return Field{(x & 1) << 22};
+}
+
 constexpr Field Rd(u32 x) {
+  ASSERT(x >= 0 && x <= ((2 ^ 5) - 1));
   return Field{(x & 31) << 0};
 }
 
 constexpr Field Rt(u32 x) {
+  ASSERT(x >= 0 && x <= ((2 ^ 5) - 1));
   return Field{(x & 31) << 0};
 }
 
 constexpr Field Rn(u32 x) {
+  ASSERT(x >= 0 && x <= ((2 ^ 5) - 1));
   return Field{(x & 31) << 5};
 }
 
 constexpr Field Rm(u32 x) {
+  ASSERT(x >= 0 && x <= ((2 ^ 5) - 1));
   return Field{(x & 31) << 16};
 }
 
@@ -111,10 +126,10 @@ struct InstructionARM64 : InstructionImpl<InstructionARM64> {
   //
   // To do so, the instruction can optionally include multiple encodings
   // all of which are emitted at once.
-  static constexpr int kMaxInstrs = 4;
+  static constexpr int kMaxInstrs = 64;
 
   u32 encodings[kMaxInstrs]{};
-  uint8_t count = 0;
+  u8 count = 0;
 
   InstructionARM64() = delete;
 
@@ -131,13 +146,23 @@ struct InstructionARM64 : InstructionImpl<InstructionARM64> {
   constexpr InstructionARM64(const Instrs&... instrs)
     requires(std::is_same_v<Instrs, InstructionARM64> && ...)
   {
-    uint8_t idx = 0;
+    u8 idx = 0;
     auto append = [&](const InstructionARM64& i) {
       for (uint8_t j = 0; j < i.count; ++j) {
         encodings[idx++] = i.encodings[j];
       }
     };
     (append(instrs), ...);
+    count = idx;
+  }
+
+  InstructionARM64(std::span<const InstructionARM64> instrs) {
+    u8 idx = 0;
+    for (const auto& i : instrs) {
+      for (uint8_t j = 0; j < i.count; ++j) {
+        encodings[idx++] = i.encodings[j];
+      }
+    }
     count = idx;
   }
 

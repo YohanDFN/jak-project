@@ -652,83 +652,146 @@ InstructionARM64 jmp_r64(Register reg) {
 //   INTEGER MATH
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-// NOTE: ARM can actually handle 12-bit immediate values, so if it's actually worth it, we
-// could leverage these instructions for more than just 8-bit values
 InstructionARM64 sub_gpr64_imm8s(Register reg, int64_t imm) {
-  // You cannot subtract or add with a negative immediate in ARM
-  // therefore depending on the value of the immediate, we use a different instruction
-  ASSERT(reg.is_gpr(instr_set));
-  if (imm < 0) {
-    return add_gpr64_imm8s(reg, std::abs(imm));
-  }
-  // https://www.scs.stanford.edu/~zyedidia/arm64/sub_addsub_imm.html
-  // - SUB <Xd>, <Xn>, #imm12 {, LSL #12}
-  // - using a shift of 0 here (last bit in the base)
-  return InstructionARM64(Base(0b1101000100, 10), Imm12(imm), Rn(reg.id()), Rd(reg.id()));
+  return sub_gpr64_imm(reg, imm);
 }
 
-// NOTE: ARM can actually handle 12-bit immediate values, so if it's actually worth it, we
-// could leverage these instructions for more than just 8-bit values
 InstructionARM64 add_gpr64_imm8s(Register reg, int64_t imm) {
-  // You cannot subtract or add with a negative immediate in ARM
-  // therefore depending on the value of the immediate, we use a different instruction
-  ASSERT(reg.is_gpr(instr_set));
-  if (imm < 0) {
-    return sub_gpr64_imm8s(reg, abs(imm));
-  }
-  // https://www.scs.stanford.edu/~zyedidia/arm64/add_addsub_imm.html
-  // ADD <Xd|SP>, <Xn|SP>, #<imm>{, <shift>}
-  return InstructionARM64(Base(0b1001000100, 10), Imm12(imm), Rn(reg.id()), Rd(reg.id()));
+  return add_gpr64_imm(reg, imm);
 }
 
 InstructionARM64 sub_gpr64_imm32s(Register reg, int64_t imm) {
-  // ARM64 does not support this kind of single-instruction
-  ASSERT_MSG(false, "sub_gpr64_imm32s not supported on ARM64");
-  return InstructionARM64(0b0);
+  return sub_gpr64_imm(reg, imm);
 }
 
 InstructionARM64 add_gpr64_imm32s(Register reg, int64_t imm) {
-  // ARM64 does not support this kind of single-instruction
-  ASSERT_MSG(false, "sub_gpr64_imm32s not supported on ARM64");
-  return InstructionARM64(0b0);
+  return add_gpr64_imm(reg, imm);
+}
+
+// Checks whether or not an immediate can be represented in 12 unsigned bits, either:
+// - plain [0-4095] immediate
+// - imm << 12 (some multiple of 4096)
+std::tuple<bool, u16, bool> can_encode_single_imm12(u64 imm) {
+  if (imm < 4096) {
+    return {true, static_cast<u16>(imm), false};
+  }
+  if ((imm & 0xFFF) == 0) {  // divisible by 4096
+    uint32_t upper = imm >> 12;
+    if (upper < 4096) {
+      return {true, static_cast<uint16_t>(upper), true};
+    }
+  }
+  return {false, 0, false};
+}
+
+// Given a larger than u12 immediate, decompose it into multiple (shifted or not)
+// immediates that can be used to emit multiple instructions to produce the desired outcome
+std::vector<std::tuple<u16, bool>> decompose_into_imm12_chunks(u64 imm) {
+  std ::vector<std::tuple<u16, bool>> result;
+  u32 upper = imm >> 12;
+  while (upper > 0) {
+    u16 chunk = (upper > 4095) ? 4095 : static_cast<u16>(upper);
+    result.emplace_back(chunk, true);
+    upper -= chunk;
+  }
+
+  u16 lower = imm & 0xFFF;
+  if (lower > 0) {
+    result.emplace_back(lower, false);
+  }
+  return result;
 }
 
 InstructionARM64 add_gpr64_imm(Register reg, int64_t imm) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+  ASSERT(reg.is_gpr(instr_set));
+  if (imm < 0) {
+    sub_gpr64_imm(reg, std::abs(imm));
+  }
+  // Check to see if we can represent this subtraction in a single instruction
+  // if not, then we need to emit multiple partial instructions
+  const auto [is_single_instr, imm12, needs_shift] = can_encode_single_imm12(imm);
+  if (is_single_instr) {
+    // https://www.scs.stanford.edu/~zyedidia/arm64/add_addsub_imm.html
+    // ADD <Xd|SP>, <Xn|SP>, #<imm>{, <shift>}
+    return InstructionARM64(Base(0b100100010, 9), Sh(needs_shift ? 1 : 0), Imm12(imm12),
+                            Rd(reg.id()), Rn(reg.id()));
+  } else {
+    const auto chunks = decompose_into_imm12_chunks(imm);
+    std::vector<InstructionARM64> instrs;
+    for (const auto& [_imm12, _needs_shift] : chunks) {
+      // https://www.scs.stanford.edu/~zyedidia/arm64/add_addsub_imm.html
+      // ADD <Xd|SP>, <Xn|SP>, #<imm>{, <shift>}
+      instrs.emplace_back(InstructionARM64(Base(0b100100010, 9), Sh(_needs_shift ? 1 : 0),
+                                           Imm12(_imm12), Rd(reg.id()), Rn(reg.id())));
+    }
+    return InstructionARM64(instrs);
+  }
 }
 
 InstructionARM64 sub_gpr64_imm(Register reg, int64_t imm) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+  ASSERT(reg.is_gpr(instr_set));
+  if (imm < 0) {
+    add_gpr64_imm(reg, std::abs(imm));
+  }
+  // Check to see if we can represent this subtraction in a single instruction
+  // if not, then we need to emit multiple partial instructions
+  const auto [is_single_instr, imm12, needs_shift] = can_encode_single_imm12(imm);
+  if (is_single_instr) {
+    // https://www.scs.stanford.edu/~zyedidia/arm64/sub_addsub_imm.html
+    // SUB <Xd|SP>, <Xn|SP>, #<imm>{, <shift>}
+    return InstructionARM64(Base(0b110100010, 9), Sh(needs_shift ? 1 : 0), Imm12(imm12),
+                            Rd(reg.id()), Rn(reg.id()));
+  } else {
+    const auto chunks = decompose_into_imm12_chunks(imm);
+    std::vector<InstructionARM64> instrs;
+    for (const auto& [_imm12, _needs_shift] : chunks) {
+      // https://www.scs.stanford.edu/~zyedidia/arm64/sub_addsub_imm.html
+      // SUB <Xd|SP>, <Xn|SP>, #<imm>{, <shift>}
+      instrs.emplace_back(InstructionARM64(Base(0b110100010, 9), Sh(_needs_shift ? 1 : 0),
+                                           Imm12(_imm12), Rd(reg.id()), Rn(reg.id())));
+    }
+    return InstructionARM64(instrs);
+  }
 }
 
 InstructionARM64 add_gpr64_gpr64(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+  // https://www.scs.stanford.edu/~zyedidia/arm64/add_addsub_shift.html
+  // ADD <Xd>, <Xn>, <Xm>{, <shift> #<amount>}
+  return InstructionARM64(Base(0b10001011000, 11), Rd(dst.id()), Imm6(0), Rn(dst.id()),
+                          Rm(src.id()));
 }
 
 InstructionARM64 sub_gpr64_gpr64(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+  // https://www.scs.stanford.edu/~zyedidia/arm64/sub_addsub_shift.html
+  // SUB <Xd>, <Xn>, <Xm>{, <shift> #<amount>}
+  return InstructionARM64(Base(0b11001011000, 11), Rd(dst.id()), Imm6(0), Rn(dst.id()),
+                          Rm(src.id()));
 }
 
 InstructionARM64 imul_gpr32_gpr32(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+  // https://www.scs.stanford.edu/~zyedidia/arm64/mul_madd.html
+  // MUL <Wd>, <Wn>, <Wm>
+  return InstructionARM64(Base(0b0001101100000000011111, 22), Rd(dst.id()), Rn(dst.id()),
+                          Rm(src.id()));
 }
 
 InstructionARM64 imul_gpr64_gpr64(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+  // https://www.scs.stanford.edu/~zyedidia/arm64/mul_madd.html
+  // MUL <Xd>, <Xn>, <Xm>
+  return InstructionARM64(Base(0b1001101100000000011111, 22), Rd(dst.id()), Rn(dst.id()),
+                          Rm(src.id()));
 }
 
 InstructionARM64 idiv_gpr32(Register reg) {
+  // divides on x86 are annoying, its one of many that involve hard-coded register src/destinations,
+  // deal with it last
   ASSERT_MSG(false, "not yet implemented");
   return InstructionARM64(0b0);
 }
 
 InstructionARM64 unsigned_div_gpr32(Register reg) {
+  // divides on x86 are annoying, its one of many that involve hard-coded register src/destinations,
+  // deal with it last
   ASSERT_MSG(false, "not yet implemented");
   return InstructionARM64(0b0);
 }
@@ -743,13 +806,15 @@ InstructionARM64 cdq() {
 }
 
 InstructionARM64 movsx_r64_r32(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+  // https://www.scs.stanford.edu/~zyedidia/arm64/sxtw_sbfm.html
+  // SXTW <Xd>, <Wn>
+  return InstructionARM64(Base(0b1001001101000000011111, 22), Rd(dst.id()), Rn(src.id()));
 }
 
 InstructionARM64 cmp_gpr64_gpr64(Register a, Register b) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+  // https://www.scs.stanford.edu/~zyedidia/arm64/cmp_subs_addsub_ext.html
+  // CMP <Xn|SP>, <R><m>{, <extend> {#<amount>}}
+  return InstructionARM64(Base(0b11101011001000000000000000011111, 32), Rn(a.id()), Rn(b.id()));
 }
 
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
