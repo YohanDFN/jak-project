@@ -1564,7 +1564,10 @@ class StackSpillStoreElement : public FormElement {
 // the value from a stack load.
 class StackSpillValueElement : public FormElement {
  public:
-  StackSpillValueElement(int size, int stack_offset, bool is_signed);
+  StackSpillValueElement(int size,
+                         int stack_offset,
+                         bool is_signed,
+                         std::optional<TypeSpec> read_type = std::nullopt);
   goos::Object to_form_internal(const Env& env) const override;
   void apply(const std::function<void(FormElement*)>& f) override;
   void apply_form(const std::function<void(Form*)>& f) override;
@@ -1580,6 +1583,7 @@ class StackSpillValueElement : public FormElement {
   int m_size = -1;
   int m_stack_offset = -1;
   bool m_is_signed = false;
+  std::optional<TypeSpec> m_read_type;
 };
 
 class MethodOfTypeElement : public FormElement {

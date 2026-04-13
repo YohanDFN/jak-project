@@ -843,9 +843,13 @@ FormElement* StackSpillLoadOp::get_as_form(FormPool& pool, const Env& env) const
   if (kv != env.stack_slot_entries.end()) {
     type = kv->second.typespec;
   }
+  std::optional<TypeSpec> read_type;
+  if (env.has_type_analysis()) {
+    read_type = env.get_types_before_op(m_my_idx).get_slot(m_offset).typespec();
+  }
   return pool.alloc_element<SetVarElement>(m_dst,
                                            pool.alloc_single_element_form<StackSpillValueElement>(
-                                               nullptr, m_size, m_offset, m_is_signed),
+                                               nullptr, m_size, m_offset, m_is_signed, read_type),
                                            true, type);
 }
 

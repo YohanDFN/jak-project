@@ -162,6 +162,10 @@ std::string Env::get_variable_name(const RegisterAccess& access) const {
 }
 
 std::string Env::get_variable_name_name_only(const RegisterAccess& access) const {
+  if (is_stack_slot_access(access)) {
+    return get_spill_slot_var_name(get_stack_slot_offset_from_access(access));
+  }
+
   if (access.reg().get_kind() == Reg::FPR || access.reg().get_kind() == Reg::GPR) {
     auto& var_info = m_var_names.lookup(access.reg(), access.idx(), access.mode());
     return var_info.name();
@@ -172,6 +176,14 @@ std::string Env::get_variable_name_name_only(const RegisterAccess& access) const
 }
 
 VariableWithCast Env::get_variable_and_cast(const RegisterAccess& access) const {
+  if (is_stack_slot_access(access)) {
+    VariableWithCast result;
+    auto original_name = get_spill_slot_var_name(get_stack_slot_offset_from_access(access));
+    auto remapped = m_var_remap.find(original_name);
+    result.name = remapped != m_var_remap.end() ? remapped->second : original_name;
+    return result;
+  }
+
   if (access.reg().get_kind() == Reg::FPR || access.reg().get_kind() == Reg::GPR) {
     auto& var_info = m_var_names.lookup(access.reg(), access.idx(), access.mode());
     // this is a bit of a confusing process.  The first step is to grab the auto-generated name:
@@ -272,6 +284,10 @@ goos::Object Env::get_variable_name_with_cast(Register reg, int atomic_idx, Acce
 }
 
 std::optional<TypeSpec> Env::get_user_cast_for_access(const RegisterAccess& access) const {
+  if (is_stack_slot_access(access)) {
+    return {};
+  }
+
   if (access.reg().get_kind() == Reg::FPR || access.reg().get_kind() == Reg::GPR) {
     auto& var_info = m_var_names.lookup(access.reg(), access.idx(), access.mode());
     std::string original_name = var_info.name();
@@ -310,6 +326,22 @@ std::optional<TypeSpec> Env::get_user_cast_for_access(const RegisterAccess& acce
  * of the variable.
  */
 TypeSpec Env::get_variable_type(const RegisterAccess& access, bool using_user_var_types) const {
+  if (is_stack_slot_access(access)) {
+    auto offset = get_stack_slot_offset_from_access(access);
+    auto it = stack_slot_entries.find(offset);
+    if (it != stack_slot_entries.end()) {
+      auto type_of_var = it->second.typespec;
+      if (using_user_var_types) {
+        auto retype_kv = m_var_retype.find(it->second.name());
+        if (retype_kv != m_var_retype.end()) {
+          type_of_var = retype_kv->second;
+        }
+      }
+      return type_of_var;
+    }
+    return TypeSpec("object");
+  }
+
   if (access.reg().get_kind() == Reg::FPR || access.reg().get_kind() == Reg::GPR) {
     auto& var_info = m_var_names.lookup(access.reg(), access.idx(), access.mode());
     std::string original_name = var_info.name();
@@ -326,6 +358,37 @@ TypeSpec Env::get_variable_type(const RegisterAccess& access, bool using_user_va
   } else {
     throw std::runtime_error("Types are not supported for this kind of register");
   }
+}
+
+TP_Type Env::get_variable_tp_type(const RegisterAccess& access, bool using_user_var_types) const {
+  if (is_stack_slot_access(access)) {
+    auto offset = get_stack_slot_offset_from_access(access);
+    auto it = stack_slot_entries.find(offset);
+    if (it != stack_slot_entries.end()) {
+      auto type_of_var = it->second.tp_type;
+      if (using_user_var_types) {
+        auto retype_kv = m_var_retype.find(it->second.name());
+        if (retype_kv != m_var_retype.end()) {
+          type_of_var = TP_Type::make_from_ts(retype_kv->second);
+        }
+      }
+      return type_of_var;
+    }
+    return TP_Type::make_from_ts(TypeSpec("object"));
+  }
+
+  if (access.reg().get_kind() == Reg::FPR || access.reg().get_kind() == Reg::GPR) {
+    auto& var_info = m_var_names.lookup(access.reg(), access.idx(), access.mode());
+    if (using_user_var_types) {
+      auto retype_kv = m_var_retype.find(var_info.name());
+      if (retype_kv != m_var_retype.end()) {
+        return TP_Type::make_from_ts(retype_kv->second);
+      }
+    }
+    return var_info.type;
+  }
+
+  throw std::runtime_error("TP types are not supported for this kind of register");
 }
 
 /*!
@@ -420,6 +483,9 @@ std::vector<VariableNames::VarInfo> Env::extract_visible_variables(
     std::vector<std::pair<RegId, RegisterAccess>> vars;
 
     for (auto& x : var_set) {
+      if (is_stack_slot_access(x)) {
+        continue;
+      }
       if (x.reg().get_kind() == Reg::FPR || x.reg().get_kind() == Reg::GPR) {
         vars.push_back(std::make_pair(get_program_var_id(x), x));
       }
@@ -519,6 +585,9 @@ FunctionVariableDefinitions Env::local_var_type_list(const Form* top_level_form,
   std::sort(spills.begin(), spills.end(),
             [](const StackSpillEntry& a, const StackSpillEntry& b) { return a.offset < b.offset; });
   for (auto& x : spills) {
+    if (m_vars_defined_in_let.find(x.name()) != m_vars_defined_in_let.end()) {
+      continue;
+    }
     elts.push_back(pretty_print::build_list(x.name(), x.typespec.print()));
     count++;
   }
@@ -549,12 +618,18 @@ const UseDefInfo& Env::get_use_def_info(const RegisterAccess& ra) const {
 }
 
 void Env::disable_def(const RegisterAccess& access, DecompWarnings& warnings) {
+  if (is_stack_slot_access(access)) {
+    return;
+  }
   if (has_local_vars()) {
     m_var_names.disable_def(access, warnings);
   }
 }
 
 void Env::disable_use(const RegisterAccess& access) {
+  if (is_stack_slot_access(access)) {
+    return;
+  }
   if (has_local_vars()) {
     m_var_names.disable_use(access);
   }

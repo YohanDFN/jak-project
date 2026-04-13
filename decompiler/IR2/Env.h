@@ -44,6 +44,26 @@ struct StackSpillEntry {
   }
 };
 
+inline bool is_stack_slot_access(const RegisterAccess& access) {
+  return access.reg() == Register(Reg::GPR, Reg::SP) && access.idx() < 0;
+}
+
+inline int get_stack_slot_offset_from_access(const RegisterAccess& access) {
+  ASSERT(is_stack_slot_access(access));
+  return -access.idx() - 1;
+}
+
+inline RegisterAccess make_stack_slot_access(int offset) {
+  return RegisterAccess(AccessMode::READ, Register(Reg::GPR, Reg::SP), -offset - 1, true);
+}
+
+inline bool same_expression_var(const RegisterAccess& a, const RegisterAccess& b) {
+  if (is_stack_slot_access(a) || is_stack_slot_access(b)) {
+    return a == b;
+  }
+  return a.reg() == b.reg();
+}
+
 struct FunctionVariableDefinitions {
   std::optional<goos::Object> local_vars;
   bool had_pp = false;

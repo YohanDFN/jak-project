@@ -12,6 +12,7 @@
 #include "common/util/BitUtils.h"
 #include "common/util/print_float.h"
 
+#include "decompiler/IR2/Env.h"
 #include "decompiler/IR2/ExpressionHelpers.h"
 #include "decompiler/IR2/bitfields.h"
 #include "decompiler/ObjectFile/LinkedObjectFile.h"
@@ -65,6 +66,27 @@
 namespace decompiler {
 
 namespace {
+Form* cast_form(Form* in, const TypeSpec& new_type, FormPool& pool, const Env& env, bool tc_pass);
+
+TypeSpec get_input_type_for_access(const Env& env, const RegisterAccess& access) {
+  if (is_stack_slot_access(access)) {
+    return env.get_variable_type(access, true);
+  }
+  return env.get_types_before_op(access.idx()).get(access.reg()).typespec();
+}
+
+Form* cast_stack_slot_var_if_needed(Form* in,
+                                    const TypeSpec& desired_type,
+                                    FormPool& pool,
+                                    const Env& env) {
+  auto atom = form_as_atom(in);
+  if (atom && atom->is_var() && is_stack_slot_access(atom->var()) &&
+      env.get_variable_type(atom->var(), true) != desired_type) {
+    return cast_form(in, desired_type, pool, env, false);
+  }
+  return in;
+}
+
 Form* strip_pcypld_64(Form* in) {
   auto m = match(Matcher::op(GenericOpMatcher::fixed(FixedOperatorKind::PCPYLD),
                              {Matcher::integer(0), Matcher::any(0)}),
@@ -347,6 +369,9 @@ Form* repop_passthrough_arg(Form* in,
 
   auto as_atom = form_as_atom(in);
   if (as_atom && as_atom->is_var()) {
+    if (is_stack_slot_access(as_atom->var())) {
+      return in;
+    }
     return stack.pop_reg(as_atom->var().reg(), {}, env, true, -1, orig_out, found_orig_out);
   }
   return in;
@@ -389,6 +414,9 @@ void pop_helper(const std::vector<RegisterAccess>& vars,
 
   for (size_t var_idx = 0; var_idx < vars.size(); var_idx++) {
     const auto& var = vars.at(var_idx);
+    if (is_stack_slot_access(var)) {
+      continue;
+    }
     auto& ri = env.reg_use().op.at(var.idx());
     RegSet consumes_to_use = consumes.value_or(ri.consumes);
     if (consumes_to_use.find(var.reg()) != consumes_to_use.end()) {
@@ -555,6 +583,14 @@ std::vector<Form*> pop_to_forms(const std::vector<RegisterAccess>& vars,
   for (size_t i = 0; i < vars.size(); i++) {
     auto atom = form_as_atom(forms[i]);
     bool is_var = atom && atom->is_var();
+    if (is_var && is_stack_slot_access(atom->var())) {
+      auto access_type = get_input_type_for_access(env, vars[i]);
+      if (env.get_variable_type(atom->var(), true) != access_type) {
+        forms[i] = cast_form(forms[i], access_type, pool, env);
+        atom = form_as_atom(forms[i]);
+        is_var = atom && atom->is_var();
+      }
+    }
     auto cast = env.get_user_cast_for_access(vars[i]);
     // only cast if we didn't get a var (compacting expressions).
     // there is a separate system for casting variables that will do a better job.
@@ -1146,7 +1182,9 @@ void SimpleExpressionElement::update_from_stack_add_i(const Env& env,
             }
           }
           ASSERT(used_index);
-          result->push_back(pool.alloc_element<DerefElement>(args.at(1), out.addr_of, tokens));
+          result->push_back(pool.alloc_element<DerefElement>(
+              cast_stack_slot_var_if_needed(args.at(1), arg1_type.typespec(), pool, env),
+              out.addr_of, tokens));
           return;
         } else {
           throw std::runtime_error(
@@ -1186,7 +1224,9 @@ void SimpleExpressionElement::update_from_stack_add_i(const Env& env,
               }
             }
             ASSERT(used_index);
-            result->push_back(pool.alloc_element<DerefElement>(args.at(1), out.addr_of, tokens));
+            result->push_back(pool.alloc_element<DerefElement>(
+                cast_stack_slot_var_if_needed(args.at(1), arg1_type.typespec(), pool, env),
+                out.addr_of, tokens));
             return;
           } else {
             throw std::runtime_error(
@@ -1215,7 +1255,9 @@ void SimpleExpressionElement::update_from_stack_add_i(const Env& env,
               }
             }
             ASSERT(used_index);
-            result->push_back(pool.alloc_element<DerefElement>(args.at(1), out.addr_of, tokens));
+            result->push_back(pool.alloc_element<DerefElement>(
+                cast_stack_slot_var_if_needed(args.at(1), arg1_type.typespec(), pool, env),
+                out.addr_of, tokens));
             return;
           } else {
             throw std::runtime_error(
@@ -1267,7 +1309,9 @@ void SimpleExpressionElement::update_from_stack_add_i(const Env& env,
             }
           }
           ASSERT(used_index);
-          result->push_back(pool.alloc_element<DerefElement>(args.at(0), rd_ok.addr_of, tokens));
+          result->push_back(pool.alloc_element<DerefElement>(
+              cast_stack_slot_var_if_needed(args.at(0), arg0_type.typespec(), pool, env),
+              rd_ok.addr_of, tokens));
           return;
         } else {
           throw std::runtime_error(fmt::format(
@@ -1318,7 +1362,9 @@ void SimpleExpressionElement::update_from_stack_add_i(const Env& env,
             }
           }
           ASSERT(used_index);
-          result->push_back(pool.alloc_element<DerefElement>(args.at(1), rd_ok.addr_of, tokens));
+          result->push_back(pool.alloc_element<DerefElement>(
+              cast_stack_slot_var_if_needed(args.at(1), arg1_type.typespec(), pool, env),
+              rd_ok.addr_of, tokens));
           return;
         } else {
           // TODO - output error to IR
@@ -1341,7 +1387,9 @@ void SimpleExpressionElement::update_from_stack_add_i(const Env& env,
           tokens.push_back(to_token(tok));
         }
 
-        result->push_back(pool.alloc_element<DerefElement>(args.at(1), out.addr_of, tokens));
+        result->push_back(pool.alloc_element<DerefElement>(
+            cast_stack_slot_var_if_needed(args.at(1), arg1_type.typespec(), pool, env), out.addr_of,
+            tokens));
         return;
       }
     }
@@ -2357,7 +2405,7 @@ void SimpleExpressionElement::update_from_stack_int_to_float(const Env& env,
   // the gpr->fpr operation beacuse it doesn't matter.
   auto fpr_convert_matcher =
       Matcher::op(GenericOpMatcher::fixed(FixedOperatorKind::GPR_TO_FPR), {Matcher::any(0)});
-  auto type = env.get_types_before_op(var.idx()).get(var.reg()).typespec();
+  auto type = get_input_type_for_access(env, var);
   // want to allow any child of integer so integer enums can also be converted to floats.
   if (env.dts->ts.tc(TypeSpec("integer"), type) || type == TypeSpec("seconds")) {
     auto mr = match(fpr_convert_matcher, arg);
@@ -2379,7 +2427,7 @@ void SimpleExpressionElement::update_from_stack_float_to_int(const Env& env,
                                                              bool allow_side_effects) {
   auto var = m_expr.get_arg(0).var();
   auto arg = pop_to_forms({var}, env, pool, stack, allow_side_effects).at(0);
-  auto type = env.get_types_before_op(var.idx()).get(var.reg()).typespec();
+  auto type = get_input_type_for_access(env, var);
   auto fpr_convert_matcher =
       Matcher::op(GenericOpMatcher::fixed(FixedOperatorKind::GPR_TO_FPR), {Matcher::any(0)});
   auto mr = match(fpr_convert_matcher, arg);
@@ -2412,7 +2460,7 @@ void SimpleExpressionElement::update_from_stack_subu_l32_s7(const Env& env,
                                                             bool allow_side_effects) {
   auto var = m_expr.get_arg(0).var();
   auto arg = pop_to_forms({var}, env, pool, stack, allow_side_effects).at(0);
-  auto type = env.get_types_before_op(var.idx()).get(var.reg()).typespec();
+  auto type = get_input_type_for_access(env, var);
   if (type != TypeSpec("handle")) {
     env.func->warnings.warning(
         ".subu (32-bit) used on a {} at idx {}. This probably should be a handle.", type.print(),
@@ -2634,9 +2682,12 @@ void SetVarElement::push_to_stack(const Env& env, FormPool& pool, FormStack& sta
         }
 
         auto var = src_as_se->expr().get_arg(0).var();
-        auto& info = env.reg_use().op.at(var.idx());
-        if (var.reg() == Register(Reg::GPR, Reg::S6) ||
-            info.consumes.find(var.reg()) != info.consumes.end()) {
+        bool is_consumed_reg_move = false;
+        if (!is_stack_slot_access(var)) {
+          auto& info = env.reg_use().op.at(var.idx());
+          is_consumed_reg_move = info.consumes.find(var.reg()) != info.consumes.end();
+        }
+        if (var.reg() == Register(Reg::GPR, Reg::S6) || is_consumed_reg_move) {
           stack.push_non_seq_reg_to_reg(m_dst, src_as_se->expr().get_arg(0).var(), m_src,
                                         m_src_type, m_var_info);
           return;
@@ -3495,8 +3546,14 @@ void FunctionCallElement::update_from_stack(const Env& env,
   }
 
   TypeSpec function_type;
-  auto& in_type_state = env.get_types_before_op(all_pop_vars.at(0).idx());
-  auto& tp_type = in_type_state.get(all_pop_vars.at(0).reg());
+  const TypeState* in_type_state = nullptr;
+  TP_Type tp_type;
+  if (!is_stack_slot_access(all_pop_vars.at(0))) {
+    in_type_state = &env.get_types_before_op(all_pop_vars.at(0).idx());
+    tp_type = in_type_state->get(all_pop_vars.at(0).reg());
+  } else {
+    tp_type = env.get_variable_tp_type(all_pop_vars.at(0), true);
+  }
   if (env.has_type_analysis()) {
     function_type = tp_type.typespec();
   }
@@ -3504,7 +3561,8 @@ void FunctionCallElement::update_from_stack(const Env& env,
   // if we're actually a go:
   Form* go_next_state = nullptr;
   if (tp_type.kind == TP_Type::Kind::ENTER_STATE_FUNCTION) {
-    auto& next_state_type = in_type_state.next_state_type;
+    ASSERT(in_type_state);
+    auto& next_state_type = in_type_state->next_state_type;
     if (next_state_type.typespec().base_type() != "state") {
       throw std::runtime_error("Bad state type in expressions (not state): " +
                                next_state_type.print());
@@ -3591,7 +3649,7 @@ void FunctionCallElement::update_from_stack(const Env& env,
     auto val = unstacked.at(arg_id + 1);  // first is the function itself.
     auto& var = all_pop_vars.at(arg_id + 1);
     if (has_good_types) {
-      auto actual_arg_type = env.get_types_before_op(var.idx()).get(var.reg()).typespec();
+      auto actual_arg_type = get_input_type_for_access(env, var);
 
       if (arg_id == 0) {
         first_arg_type = actual_arg_type;
@@ -3997,7 +4055,7 @@ void FunctionCallElement::update_from_stack(const Env& env,
         ASSERT(new_args.size() >= 3);
         for (size_t i = 0; i < 3; i++) {
           auto& var = all_pop_vars.at(i + 1);  // 0 is the function itself.
-          auto arg_type = env.get_types_before_op(var.idx()).get(var.reg()).typespec();
+          auto arg_type = get_input_type_for_access(env, var);
           if (!env.dts->ts.tc(expected_arg_types.at(i), arg_type)) {
             new_args.at(i) = pool.form<CastElement>(expected_arg_types.at(i), new_args.at(i));
           }
@@ -5031,9 +5089,11 @@ void CondWithElseElement::push_to_stack(const Env& env, FormPool& pool, FormStac
   // determine if set destination is used
   bool set_unused = false;
   if (rewrite_as_set) {
-    auto& info = env.reg_use().op.at(last_var->idx());
-    if (info.written_and_unused.find(last_var->reg()) != info.written_and_unused.end()) {
-      set_unused = true;
+    if (!is_stack_slot_access(*last_var)) {
+      auto& info = env.reg_use().op.at(last_var->idx());
+      if (info.written_and_unused.find(last_var->reg()) != info.written_and_unused.end()) {
+        set_unused = true;
+      }
     }
   }
 
@@ -6019,7 +6079,7 @@ void ConditionElement::push_to_stack(const Env& env, FormPool& pool, FormStack& 
     if (m_src[i]->is_var()) {
       auto& var = m_src[i]->var();
       vars.push_back(var);
-      source_types.push_back(env.get_types_before_op(var.idx()).get(var.reg()).typespec());
+      source_types.push_back(get_input_type_for_access(env, var));
     } else if (m_src[i]->is_int()) {
       if (m_src[i]->get_int() == 0 && condition_uses_float(m_kind)) {
         // if we're doing a floating point comparison, and one of our arguments is a constant
@@ -6072,7 +6132,7 @@ void ConditionElement::update_from_stack(const Env& env,
     if (m_src[i]->is_var()) {
       auto& var = m_src[i]->var();
       vars.push_back(var);
-      source_types.push_back(env.get_types_before_op(var.idx()).get(var.reg()).typespec());
+      source_types.push_back(get_input_type_for_access(env, var));
     } else if (m_src[i]->is_int()) {
       if (m_src[i]->get_int() == 0 && condition_uses_float(m_kind)) {
         // if we're doing a floating point comparison, and one of our arguments is a constant
@@ -6915,11 +6975,19 @@ void StackSpillStoreElement::push_to_stack(const Env& env, FormPool& pool, FormS
     src = pool.form<SimpleAtomElement>(m_value);
   }
 
-  auto dst = pool.form<ConstantTokenElement>(env.get_spill_slot_var_name(m_stack_offset));
   if (m_cast_type) {
     src = cast_form(src, *m_cast_type, pool, env);
   }
-  stack.push_form_element(pool.alloc_element<SetFormFormElement>(dst, src), true);
+
+  TypeSpec stack_type("object");
+  auto it = env.stack_slot_entries.find(m_stack_offset);
+  if (it != env.stack_slot_entries.end()) {
+    stack_type = it->second.typespec;
+  } else if (m_cast_type) {
+    stack_type = *m_cast_type;
+  }
+
+  stack.push_value_to_reg(make_stack_slot_access(m_stack_offset), src, true, stack_type);
 }
 
 namespace {
@@ -7173,13 +7241,21 @@ void StackStructureDefElement::update_from_stack(const Env&,
   result->push_back(this);
 }
 
-void StackSpillValueElement::update_from_stack(const Env&,
-                                               FormPool&,
+void StackSpillValueElement::update_from_stack(const Env& env,
+                                               FormPool& pool,
                                                FormStack&,
                                                std::vector<FormElement*>* result,
                                                bool) {
   mark_popped();
-  result->push_back(this);
+  auto var = make_stack_slot_access(m_stack_offset);
+  Form* form =
+      pool.alloc_single_element_form<SimpleAtomElement>(nullptr, SimpleAtom::make_var(var));
+  if (m_read_type && env.get_variable_type(var, true) != *m_read_type) {
+    form = cast_form(form, *m_read_type, pool, env);
+  }
+  for (auto elt : form->elts()) {
+    result->push_back(elt);
+  }
 }
 
 void GetSymbolStringPointer::update_from_stack(const Env&,

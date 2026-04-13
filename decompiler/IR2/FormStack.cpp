@@ -325,7 +325,7 @@ std::vector<FormElement*> FormStack::rewrite(FormPool& pool, const Env& env) con
         while (keep_going && !result.empty()) {
           keep_going = false;
           auto last_op_as_set = dynamic_cast<SetVarElement*>(result.back());
-          if (last_op_as_set && last_op_as_set->dst().reg() == var_to_get.reg()) {
+          if (last_op_as_set && same_expression_var(last_op_as_set->dst(), var_to_get)) {
             result.pop_back();
             auto as_one = dynamic_cast<SimpleExpressionElement*>(
                 last_op_as_set->src()->try_as_single_element());
@@ -384,7 +384,7 @@ std::optional<RegisterAccess> rewrite_to_get_var(std::vector<FormElement*>& defa
   while (keep_going && !default_result.empty()) {
     keep_going = false;
     auto last_op_as_set = dynamic_cast<SetVarElement*>(default_result.back());
-    if (last_op_as_set && last_op_as_set->dst().reg() == var_to_get.reg() &&
+    if (last_op_as_set && same_expression_var(last_op_as_set->dst(), var_to_get) &&
         (first || last_op_as_set->info().is_compactable)) {
       default_result.pop_back();
       auto as_one =
