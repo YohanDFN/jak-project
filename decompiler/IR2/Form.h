@@ -1568,6 +1568,7 @@ class StackSpillValueElement : public FormElement {
                          int stack_offset,
                          bool is_signed,
                          std::optional<TypeSpec> read_type = std::nullopt);
+  int stack_offset() const { return m_stack_offset; }
   goos::Object to_form_internal(const Env& env) const override;
   void apply(const std::function<void(FormElement*)>& f) override;
   void apply_form(const std::function<void(Form*)>& f) override;

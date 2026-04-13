@@ -146,6 +146,7 @@ class Env {
   void set_local_vars(const VariableNames& names) {
     m_var_names = names;
     m_has_local_vars = true;
+    rebuild_stack_slot_use_def_info();
   }
 
   void set_end_var(RegisterAccess var) { m_end_var = var; }
@@ -248,6 +249,8 @@ class Env {
   bool pp_mapped_by_behavior() const { return m_pp_mapped_by_behavior; }
 
  private:
+  void rebuild_stack_slot_use_def_info();
+
   RegisterAccess m_end_var;
 
   bool m_has_reg_use = false;
@@ -255,6 +258,7 @@ class Env {
 
   bool m_has_local_vars = false;
   VariableNames m_var_names;
+  std::unordered_map<RegId, UseDefInfo, RegId::hash> m_stack_slot_use_def_info;
 
   bool m_has_types = false;
   bool m_pp_mapped_by_behavior = false;

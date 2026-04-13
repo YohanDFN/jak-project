@@ -9,6 +9,17 @@
 #include "decompiler/util/DecompilerTypeSystem.h"
 
 namespace decompiler {
+namespace {
+bool nonempty_intersection(const RegSet& a, const RegSet& b) {
+  for (auto x : a) {
+    if (b.find(x) != b.end()) {
+      return true;
+    }
+  }
+  return false;
+}
+}  // namespace
+
 std::string FormStack::StackEntry::print(const Env& env) const {
   if (destination.has_value()) {
     ASSERT(source && !elt);
@@ -116,19 +127,59 @@ Form* FormStack::pop_reg(const RegisterAccess& var,
                          const Env& env,
                          bool allow_side_effects,
                          int begin_idx) {
-  return pop_reg(var.reg(), barrier, env, allow_side_effects, begin_idx);
-}
+  RegSet modified;
+  size_t begin = m_stack.size();
+  if (begin_idx >= 0) {
+    begin = begin_idx;
+  }
+  for (size_t i = begin; i-- > 0;) {
+    auto& entry = m_stack.at(i);
+    if (entry.active) {
+      if (entry.destination.has_value() && same_expression_var(*entry.destination, var)) {
+        entry.source->get_modified_regs(modified);
+        if (!allow_side_effects && entry.source->has_side_effects()) {
+          return nullptr;
+        }
+        if (nonempty_intersection(modified, barrier)) {
+          return nullptr;
+        }
+        entry.active = false;
+        ASSERT(entry.source);
+        if (entry.non_seq_source.has_value()) {
+          ASSERT(entry.sequence_point == false);
+          auto result = pop_reg(*entry.non_seq_source, barrier, env, allow_side_effects, i);
+          if (result) {
+            return result;
+          }
+        }
 
-namespace {
-bool nonempty_intersection(const RegSet& a, const RegSet& b) {
-  for (auto x : a) {
-    if (b.find(x) != b.end()) {
-      return true;
+        return entry.source;
+      } else {
+        if (entry.sequence_point) {
+          return nullptr;
+        }
+        if (entry.source) {
+          ASSERT(!entry.elt);
+          entry.source->get_modified_regs(modified);
+          if (!allow_side_effects) {
+            return nullptr;
+          }
+        } else {
+          ASSERT(entry.elt);
+          entry.elt->get_modified_regs(modified);
+          if (!allow_side_effects && entry.elt->has_side_effects()) {
+            return nullptr;
+          }
+        }
+      }
+    } else {
+      if (entry.destination.has_value() && same_expression_var(*entry.destination, var)) {
+        return nullptr;
+      }
     }
   }
-  return false;
+  return nullptr;
 }
-}  // namespace
 
 Form* FormStack::pop_reg(Register reg,
                          const RegSet& barrier,

@@ -87,6 +87,35 @@ Form* cast_stack_slot_var_if_needed(Form* in,
   return in;
 }
 
+Form* cast_inlined_function_symbol_if_needed(Form* in,
+                                             const TypeSpec& desired_type,
+                                             FormPool& pool,
+                                             const Env& env) {
+  if (!env.has_type_analysis() || desired_type.base_type() != "function") {
+    return in;
+  }
+
+  auto existing_cast = in->try_as_element<CastElement>();
+  if (existing_cast && existing_cast->type() == desired_type) {
+    return in;
+  }
+
+  auto obj = in->to_form(env);
+  if (!obj.is_symbol()) {
+    return in;
+  }
+
+  try {
+    auto symbol_type = env.dts->lookup_symbol_type(obj.as_symbol().name_ptr);
+    if (symbol_type.base_type() == "function" && symbol_type != desired_type) {
+      return pool.form<CastElement>(desired_type, in);
+    }
+  } catch (const std::runtime_error&) {
+  }
+
+  return in;
+}
+
 Form* strip_pcypld_64(Form* in) {
   auto m = match(Matcher::op(GenericOpMatcher::fixed(FixedOperatorKind::PCPYLD),
                              {Matcher::integer(0), Matcher::any(0)}),
@@ -402,19 +431,35 @@ void pop_helper(const std::vector<RegisterAccess>& vars,
                 const std::optional<RegSet>& consumes = std::nullopt,
                 const std::vector<int>& times_used = {}) {
   // to submit to stack to attempt popping
-  std::vector<Register> submit_regs;
-  // submit_reg[i] is for var submit_reg_to_var[i]
-  std::vector<size_t> submit_reg_to_var;
+  std::vector<RegisterAccess> submit_vars;
+  // submit_vars[i] is for var submit_var_to_var[i]
+  std::vector<size_t> submit_var_to_var;
 
   // build submission for stack
   std::unordered_map<Register, int, Register::hash> reg_counts;
+  std::unordered_map<std::string, int> stack_var_counts;
   for (auto& v : vars) {
-    reg_counts[v.reg()]++;
+    if (is_stack_slot_access(v)) {
+      stack_var_counts[env.get_variable_name_name_only(v)]++;
+    } else {
+      reg_counts[v.reg()]++;
+    }
   }
 
   for (size_t var_idx = 0; var_idx < vars.size(); var_idx++) {
     const auto& var = vars.at(var_idx);
     if (is_stack_slot_access(var)) {
+      int times = 1;
+      if (!times_used.empty()) {
+        times = times_used.at(var_idx);
+      }
+
+      auto& use_def = env.get_use_def_info(var);
+      if (stack_var_counts.at(env.get_variable_name_name_only(var)) == 1 &&
+          use_def.use_count() == times && use_def.def_count() == 1) {
+        submit_var_to_var.push_back(var_idx);
+        submit_vars.push_back(var);
+      }
       continue;
     }
     auto& ri = env.reg_use().op.at(var.idx());
@@ -430,8 +475,8 @@ void pop_helper(const std::vector<RegisterAccess>& vars,
 
         auto& use_def = env.get_use_def_info(var);
         if (use_def.use_count() == times && use_def.def_count() == 1) {
-          submit_reg_to_var.push_back(var_idx);
-          submit_regs.push_back(var.reg());
+          submit_var_to_var.push_back(var_idx);
+          submit_vars.push_back(var);
         } else {
           // auto var_id = env.get_program_var_id(var);
           //          lg::print(
@@ -457,9 +502,9 @@ void pop_helper(const std::vector<RegisterAccess>& vars,
   // submit and get a result! If the stack has nothing to pop, the result here may be nullptr.
   std::vector<Form*> pop_result;
   // loop in reverse (later vals first)
-  for (size_t i = submit_regs.size(); i-- > 0;) {
+  for (size_t i = submit_vars.size(); i-- > 0;) {
     // figure out what var we are:
-    auto var_idx = submit_reg_to_var.at(i);
+    auto var_idx = submit_var_to_var.at(i);
 
     // anything _less_ than this should be unmodified by the pop
     // it's fine to modify yourself in your pop.
@@ -470,7 +515,7 @@ void pop_helper(const std::vector<RegisterAccess>& vars,
 
     // do the pop, with the barrier to prevent out-of-sequence popping.
     pop_result.push_back(
-        stack.pop_reg(submit_regs.at(i), pop_barrier_regs, env, allow_side_effects));
+        stack.pop_reg(submit_vars.at(i), pop_barrier_regs, env, allow_side_effects));
   }
   // now flip back to the source order for making the final result
   std::reverse(pop_result.begin(), pop_result.end());
@@ -480,9 +525,9 @@ void pop_helper(const std::vector<RegisterAccess>& vars,
   forms.resize(vars.size(), nullptr);
   if (!pop_result.empty()) {
     // success!
-    for (size_t i = 0; i < submit_regs.size(); i++) {
+    for (size_t i = 0; i < submit_vars.size(); i++) {
       // fill out vars from our submission
-      forms.at(submit_reg_to_var.at(i)) = pop_result.at(i);
+      forms.at(submit_var_to_var.at(i)) = pop_result.at(i);
     }
   }
 
@@ -2671,6 +2716,13 @@ void SetVarElement::push_to_stack(const Env& env, FormPool& pool, FormStack& sta
   // if we are a reg-reg move that consumes the original, push it without popping from stack.
   // it is the Stack's responsibility to untangle these later on.
   if (m_src->is_single_element()) {
+    auto spill_value = dynamic_cast<StackSpillValueElement*>(m_src->back());
+    if (spill_value) {
+      stack.push_non_seq_reg_to_reg(m_dst, make_stack_slot_access(spill_value->stack_offset()),
+                                    m_src, m_src_type, m_var_info);
+      return;
+    }
+
     auto src_as_se = dynamic_cast<SimpleExpressionElement*>(m_src->back());
     if (src_as_se) {
       if (src_as_se->expr().kind() == SimpleExpression::Kind::IDENTITY &&
@@ -2683,7 +2735,10 @@ void SetVarElement::push_to_stack(const Env& env, FormPool& pool, FormStack& sta
 
         auto var = src_as_se->expr().get_arg(0).var();
         bool is_consumed_reg_move = false;
-        if (!is_stack_slot_access(var)) {
+        if (is_stack_slot_access(var)) {
+          auto& use_def = env.get_use_def_info(var);
+          is_consumed_reg_move = use_def.use_count() == 1 && use_def.def_count() == 1;
+        } else {
           auto& info = env.reg_use().op.at(var.idx());
           is_consumed_reg_move = info.consumes.find(var.reg()) != info.consumes.end();
         }
@@ -4023,7 +4078,9 @@ void FunctionCallElement::update_from_stack(const Env& env,
     }
   }
 
-  new_form = pool.alloc_element<GenericElement>(GenericOperator::make_function(unstacked.at(0)),
+  auto called_function =
+      cast_inlined_function_symbol_if_needed(unstacked.at(0), function_type, pool, env);
+  new_form = pool.alloc_element<GenericElement>(GenericOperator::make_function(called_function),
                                                 arg_forms);
 
   {
@@ -4085,7 +4142,7 @@ void FunctionCallElement::update_from_stack(const Env& env,
         if (match_result.matched) {
           auto& alloc = match_result.maps.strings.at(allocation);
           if (alloc != "global" && alloc != "debug" && alloc != "process" &&
-              alloc != "loading-level") {
+              alloc != "loading-level" && alloc != "process-level-heap") {
             throw std::runtime_error("Unrecognized heap symbol for new: " + alloc);
           }
           auto type_2 = match_result.maps.strings.at(type_for_arg);
@@ -6985,6 +7042,40 @@ void StackSpillStoreElement::push_to_stack(const Env& env, FormPool& pool, FormS
     stack_type = it->second.typespec;
   } else if (m_cast_type) {
     stack_type = *m_cast_type;
+  }
+
+  auto src_as_generic = src->try_as_element<GenericElement>();
+  if (src_as_generic && !src_as_generic->op().is_func()) {
+    using InplaceOpInfo = std::pair<FixedOperatorKind, FixedOperatorKind>;
+    const static std::array<InplaceOpInfo, 6> in_place_ops = {
+        InplaceOpInfo{FixedOperatorKind::ADDITION, FixedOperatorKind::ADDITION_IN_PLACE},
+        InplaceOpInfo{FixedOperatorKind::ADDITION_PTR, FixedOperatorKind::ADDITION_PTR_IN_PLACE},
+        InplaceOpInfo{FixedOperatorKind::LOGAND, FixedOperatorKind::LOGAND_IN_PLACE},
+        InplaceOpInfo{FixedOperatorKind::LOGIOR, FixedOperatorKind::LOGIOR_IN_PLACE},
+        InplaceOpInfo{FixedOperatorKind::LOGCLEAR, FixedOperatorKind::LOGCLEAR_IN_PLACE},
+        InplaceOpInfo{FixedOperatorKind::LOGXOR, FixedOperatorKind::LOGXOR_IN_PLACE},
+    };
+
+    auto dst_var = make_stack_slot_access(m_stack_offset);
+    auto dst_form = pool.form<SimpleAtomElement>(SimpleAtom::make_var(dst_var))->to_form(env);
+    for (const auto& [kind, inplace_kind] : in_place_ops) {
+      if (!src_as_generic->op().is_fixed(kind)) {
+        continue;
+      }
+
+      for (int inplace_arg : {0, 1}) {
+        if (src_as_generic->elts().at(inplace_arg)->to_form(env) != dst_form) {
+          continue;
+        }
+
+        if (inplace_arg != 0) {
+          std::swap(src_as_generic->elts().at(0), src_as_generic->elts().at(1));
+        }
+        src_as_generic->op() = GenericOperator::make_fixed(inplace_kind);
+        stack.push_form_element(src_as_generic, true);
+        return;
+      }
+    }
   }
 
   stack.push_value_to_reg(make_stack_slot_access(m_stack_offset), src, true, stack_type);

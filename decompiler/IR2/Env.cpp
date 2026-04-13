@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <unordered_set>
 
+#include "AtomicOp.h"
 #include "Form.h"
 
 #include "common/goos/PrettyPrinter.h"
@@ -546,6 +547,16 @@ FunctionVariableDefinitions Env::local_var_type_list(const Form* top_level_form,
                                                      int nargs_to_ignore) const {
   ASSERT(nargs_to_ignore <= 8);
   auto vars = extract_visible_variables(top_level_form);
+  std::unordered_set<int> visible_stack_slots;
+  if (top_level_form) {
+    RegAccessSet var_set;
+    top_level_form->collect_vars(var_set, true);
+    for (const auto& var : var_set) {
+      if (is_stack_slot_access(var)) {
+        visible_stack_slots.insert(get_stack_slot_offset_from_access(var));
+      }
+    }
+  }
 
   FunctionVariableDefinitions result;
   std::vector<goos::Object> elts;
@@ -580,6 +591,9 @@ FunctionVariableDefinitions Env::local_var_type_list(const Form* top_level_form,
   // it looks like this is the order the GOAL compiler itself used.
   std::vector<StackSpillEntry> spills;
   for (auto& x : stack_slot_entries) {
+    if (top_level_form && !visible_stack_slots.count(x.first)) {
+      continue;
+    }
     spills.push_back(x.second);
   }
   std::sort(spills.begin(), spills.end(),
@@ -608,17 +622,32 @@ std::unordered_set<RegId, RegId::hash> Env::get_ssa_var(const RegAccessSet& vars
 }
 
 RegId Env::get_program_var_id(const RegisterAccess& var) const {
+  if (is_stack_slot_access(var)) {
+    return RegId(Register(Reg::GPR, Reg::SP), get_stack_slot_offset_from_access(var));
+  }
   return m_var_names.lookup(var.reg(), var.idx(), var.mode()).reg_id;
 }
 
 const UseDefInfo& Env::get_use_def_info(const RegisterAccess& ra) const {
   ASSERT(has_local_vars());
+  if (is_stack_slot_access(ra)) {
+    return m_stack_slot_use_def_info.at(get_program_var_id(ra));
+  }
   auto var_id = get_program_var_id(ra);
   return m_var_names.use_def_info.at(var_id);
 }
 
 void Env::disable_def(const RegisterAccess& access, DecompWarnings& warnings) {
   if (is_stack_slot_access(access)) {
+    auto& info = m_stack_slot_use_def_info.at(get_program_var_id(access));
+    for (auto& def : info.defs) {
+      if (!def.disabled) {
+        def.disabled = true;
+        return;
+      }
+    }
+    warnings.warning("disable stack def twice: {}",
+                     get_spill_slot_var_name(get_stack_slot_offset_from_access(access)));
     return;
   }
   if (has_local_vars()) {
@@ -628,10 +657,53 @@ void Env::disable_def(const RegisterAccess& access, DecompWarnings& warnings) {
 
 void Env::disable_use(const RegisterAccess& access) {
   if (is_stack_slot_access(access)) {
+    auto& info = m_stack_slot_use_def_info.at(get_program_var_id(access));
+    for (auto& use : info.uses) {
+      if (!use.disabled) {
+        use.disabled = true;
+        return;
+      }
+    }
+    throw std::runtime_error(
+        fmt::format("Invalid disable use on stack slot {}",
+                    get_spill_slot_var_name(get_stack_slot_offset_from_access(access))));
     return;
   }
   if (has_local_vars()) {
     m_var_names.disable_use(access);
+  }
+}
+
+void Env::rebuild_stack_slot_use_def_info() {
+  m_stack_slot_use_def_info.clear();
+
+  if (!func || !func->ir2.atomic_ops) {
+    return;
+  }
+
+  const auto& ops = *func->ir2.atomic_ops;
+  std::vector<int> op_to_block(ops.ops.size(), -1);
+  for (int block_id = 0; block_id < (int)ops.block_id_to_first_atomic_op.size(); block_id++) {
+    for (int op_id = ops.block_id_to_first_atomic_op.at(block_id);
+         op_id < ops.block_id_to_end_atomic_op.at(block_id); op_id++) {
+      op_to_block.at(op_id) = block_id;
+    }
+  }
+
+  for (int op_id = 0; op_id < (int)ops.ops.size(); op_id++) {
+    const auto* op = ops.ops.at(op_id).get();
+    if (auto* store = dynamic_cast<const StackSpillStoreOp*>(op)) {
+      auto var_id = RegId(Register(Reg::GPR, Reg::SP), store->offset());
+      auto& info = m_stack_slot_use_def_info[var_id];
+      info.defs.push_back({op_id, op_to_block.at(op_id), AccessMode::WRITE, false});
+      info.ssa_vars.insert(store->offset());
+    }
+    if (auto* load = dynamic_cast<const StackSpillLoadOp*>(op)) {
+      auto var_id = RegId(Register(Reg::GPR, Reg::SP), load->offset());
+      auto& info = m_stack_slot_use_def_info[var_id];
+      info.uses.push_back({op_id, op_to_block.at(op_id), AccessMode::READ, false});
+      info.ssa_vars.insert(load->offset());
+    }
   }
 }
 
