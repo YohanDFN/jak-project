@@ -45,6 +45,7 @@ If the previous let variables appear in the definition of new one, make the let 
 
 namespace {
 FormElement* rewrite_let(LetElement* in, const Env& env, FormPool& pool, LetRewriteStats& stats);
+FormElement* rewrite_multi_let_as_vector_dot(LetElement* in, const Env& env, FormPool& pool);
 bool let_uses_stack_slot_access(const LetElement* in);
 
 std::vector<Form*> path_up_tree(Form* in, const Env&) {
@@ -2410,6 +2411,14 @@ FormElement* rewrite_set_font_single(LetElement* in,
 FormElement* rewrite_let(LetElement* in, const Env& env, FormPool& pool, LetRewriteStats& stats) {
   // ordered based on frequency. for best performance, you check the most likely rewrites first!
 
+  if (in->entries().size() >= 6) {
+    auto as_vector_dot = rewrite_multi_let_as_vector_dot(in, env, pool);
+    if (as_vector_dot) {
+      stats.vector_dot++;
+      return as_vector_dot;
+    }
+  }
+
   if (let_uses_stack_slot_access(in)) {
     return nullptr;
   }
@@ -3078,6 +3087,14 @@ FormElement* rewrite_multi_let(LetElement* in,
                                const Env& env,
                                FormPool& pool,
                                LetRewriteStats& stats) {
+  if (in->entries().size() >= 6) {
+    auto as_vector_dot = rewrite_multi_let_as_vector_dot(in, env, pool);
+    if (as_vector_dot) {
+      stats.vector_dot++;
+      return as_vector_dot;
+    }
+  }
+
   if (let_uses_stack_slot_access(in)) {
     return in;
   }
@@ -3107,14 +3124,6 @@ FormElement* rewrite_multi_let(LetElement* in,
     if (as_launch_particles) {
       stats.launch_particles++;
       return as_launch_particles;
-    }
-  }
-
-  if (in->entries().size() >= 6) {
-    auto as_vector_dot = rewrite_multi_let_as_vector_dot(in, env, pool);
-    if (as_vector_dot) {
-      stats.vector_dot++;
-      return as_vector_dot;
     }
   }
 

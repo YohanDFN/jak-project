@@ -1089,6 +1089,26 @@ void SimpleExpressionElement::update_from_stack_float_2_nestable(const Env& env,
                                                                  bool allow_side_effects) {
   if (is_float_type(env, m_my_idx, m_expr.get_arg(0).var()) &&
       is_float_type(env, m_my_idx, m_expr.get_arg(1).var())) {
+    if (m_expr.get_arg(0).var() == m_expr.get_arg(1).var()) {
+      auto arg =
+          pop_to_forms({m_expr.get_arg(0).var()}, env, pool, stack, allow_side_effects, {}, {2})
+              .at(0);
+      if (kind == FixedOperatorKind::MULTIPLICATION) {
+        result->push_back(pool.alloc_element<GenericElement>(
+            GenericOperator::make_function(pool.form<ConstantTokenElement>("square")), arg));
+        return;
+      }
+
+      auto atom = form_as_atom(arg);
+      if (atom) {
+        auto arg_copy = pool.form<SimpleAtomElement>(*atom);
+        auto new_form =
+            make_and_compact_math_op(arg, arg_copy, {}, {}, pool, env, kind, true, false);
+        result->push_back(new_form);
+        return;
+      }
+    }
+
     auto args = pop_to_forms({m_expr.get_arg(0).var(), m_expr.get_arg(1).var()}, env, pool, stack,
                              allow_side_effects);
     auto new_form =
