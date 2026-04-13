@@ -2738,8 +2738,7 @@ void SetVarElement::push_to_stack(const Env& env, FormPool& pool, FormStack& sta
   if (m_src->is_single_element()) {
     auto spill_value = dynamic_cast<StackSpillValueElement*>(m_src->back());
     if (spill_value) {
-      stack.push_non_seq_reg_to_reg(m_dst, make_stack_slot_access(spill_value->stack_offset()),
-                                    m_src, m_src_type, m_var_info);
+      stack.push_non_seq_reg_to_reg(m_dst, spill_value->access(), m_src, m_src_type, m_var_info);
       return;
     }
 
@@ -7076,7 +7075,7 @@ void StackSpillStoreElement::push_to_stack(const Env& env, FormPool& pool, FormS
         InplaceOpInfo{FixedOperatorKind::LOGXOR, FixedOperatorKind::LOGXOR_IN_PLACE},
     };
 
-    auto dst_var = make_stack_slot_access(m_stack_offset);
+    auto dst_var = m_access;
     auto dst_form = pool.form<SimpleAtomElement>(SimpleAtom::make_var(dst_var))->to_form(env);
     for (const auto& [kind, inplace_kind] : in_place_ops) {
       if (!src_as_generic->op().is_fixed(kind)) {
@@ -7098,7 +7097,7 @@ void StackSpillStoreElement::push_to_stack(const Env& env, FormPool& pool, FormS
     }
   }
 
-  stack.push_value_to_reg(make_stack_slot_access(m_stack_offset), src, true, stack_type);
+  stack.push_value_to_reg(m_access, src, true, stack_type);
 }
 
 namespace {
@@ -7358,7 +7357,7 @@ void StackSpillValueElement::update_from_stack(const Env& env,
                                                std::vector<FormElement*>* result,
                                                bool) {
   mark_popped();
-  auto var = make_stack_slot_access(m_stack_offset);
+  auto var = m_access;
   Form* form =
       pool.alloc_single_element_form<SimpleAtomElement>(nullptr, SimpleAtom::make_var(var));
   if (m_read_type && env.get_variable_type(var, true) != *m_read_type) {

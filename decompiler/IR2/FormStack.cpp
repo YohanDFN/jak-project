@@ -18,6 +18,15 @@ bool nonempty_intersection(const RegSet& a, const RegSet& b) {
   }
   return false;
 }
+
+bool can_inline_non_seq_source(const RegisterAccess& src, const Env& env) {
+  if (!is_stack_slot_access(src)) {
+    return true;
+  }
+
+  const auto& use_def = env.get_use_def_info(src);
+  return use_def.use_count() == 1 && use_def.def_count() == 1;
+}
 }  // namespace
 
 std::string FormStack::StackEntry::print(const Env& env) const {
@@ -147,9 +156,11 @@ Form* FormStack::pop_reg(const RegisterAccess& var,
         ASSERT(entry.source);
         if (entry.non_seq_source.has_value()) {
           ASSERT(entry.sequence_point == false);
-          auto result = pop_reg(*entry.non_seq_source, barrier, env, allow_side_effects, i);
-          if (result) {
-            return result;
+          if (can_inline_non_seq_source(*entry.non_seq_source, env)) {
+            auto result = pop_reg(*entry.non_seq_source, barrier, env, allow_side_effects, i);
+            if (result) {
+              return result;
+            }
           }
         }
 
@@ -215,13 +226,15 @@ Form* FormStack::pop_reg(Register reg,
         ASSERT(entry.source);
         if (entry.non_seq_source.has_value()) {
           ASSERT(entry.sequence_point == false);
-          auto result = pop_reg(entry.non_seq_source->reg(), barrier, env, allow_side_effects, i);
-          if (result) {
-            if (found_orig_out) {
-              *found_orig_out = true;
-              *orig_out = *entry.destination;
+          if (can_inline_non_seq_source(*entry.non_seq_source, env)) {
+            auto result = pop_reg(entry.non_seq_source->reg(), barrier, env, allow_side_effects, i);
+            if (result) {
+              if (found_orig_out) {
+                *found_orig_out = true;
+                *orig_out = *entry.destination;
+              }
+              return result;
             }
-            return result;
           }
         }
 

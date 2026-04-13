@@ -44,17 +44,27 @@ struct StackSpillEntry {
   }
 };
 
+constexpr int STACK_SLOT_VAR_STRIDE = 1 << 16;
+
 inline bool is_stack_slot_access(const RegisterAccess& access) {
   return access.reg() == Register(Reg::GPR, Reg::SP) && access.idx() < 0;
 }
 
 inline int get_stack_slot_offset_from_access(const RegisterAccess& access) {
   ASSERT(is_stack_slot_access(access));
-  return -access.idx() - 1;
+  return (-access.idx() - 1) / STACK_SLOT_VAR_STRIDE;
 }
 
-inline RegisterAccess make_stack_slot_access(int offset) {
-  return RegisterAccess(AccessMode::READ, Register(Reg::GPR, Reg::SP), -offset - 1, true);
+inline int get_stack_slot_var_id_from_access(const RegisterAccess& access) {
+  ASSERT(is_stack_slot_access(access));
+  return (-access.idx() - 1) % STACK_SLOT_VAR_STRIDE;
+}
+
+inline RegisterAccess make_stack_slot_access(int offset, int var_id = 0) {
+  ASSERT(var_id >= 0);
+  ASSERT(var_id < STACK_SLOT_VAR_STRIDE);
+  return RegisterAccess(AccessMode::READ, Register(Reg::GPR, Reg::SP),
+                        -1 - (offset * STACK_SLOT_VAR_STRIDE + var_id), true);
 }
 
 inline bool same_expression_var(const RegisterAccess& a, const RegisterAccess& b) {
@@ -214,6 +224,7 @@ class Env {
   }
 
   const UseDefInfo& get_use_def_info(const RegisterAccess& ra) const;
+  RegisterAccess get_stack_slot_access_for_op(int op_id, int offset) const;
   void disable_use(const RegisterAccess& access);
 
   void disable_def(const RegisterAccess& access, DecompWarnings& warnings);
@@ -259,6 +270,7 @@ class Env {
   bool m_has_local_vars = false;
   VariableNames m_var_names;
   std::unordered_map<RegId, UseDefInfo, RegId::hash> m_stack_slot_use_def_info;
+  std::unordered_map<int, int> m_stack_slot_var_by_op;
 
   bool m_has_types = false;
   bool m_pp_mapped_by_behavior = false;

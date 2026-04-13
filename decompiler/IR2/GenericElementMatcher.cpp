@@ -309,7 +309,7 @@ bool Matcher::do_match(Form* input, MatchResult::Maps* maps_out, const Env* cons
           dynamic_cast<StackSpillValueElement*>(input->try_as_single_active_element());
       if (as_stack_spill) {
         got = true;
-        result = make_stack_slot_access(as_stack_spill->stack_offset());
+        result = as_stack_spill->access();
       }
 
       if (got) {
