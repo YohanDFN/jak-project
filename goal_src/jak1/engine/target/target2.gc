@@ -114,7 +114,6 @@
    hud-normal
    hud-waiting))
 
-
 (define *fp-hud-stack* (malloc 'global #x3800))
 
 (defmethod deactivate ((this first-person-hud))
@@ -1656,11 +1655,11 @@
                     (cond
                       ((and sv-44 (< (- (-> (the-as target s4-0) control trans y) (-> (the-as target s4-0) control unknown-vector52 y)) arg2))
                        (vector-xz-normalize! (-> (the-as target s4-0) control transv) (the-as float 0.0))
-                       (case (-> (the-as target s4-0) current-level name)
-                         (('jungleb)
-                          (let ((v1-16 (vector-! (new-stack-vector0) (-> (the-as target s4-0) control trans) sv-40)))
-                            (set! (-> (the-as target s4-0) control trans x) (+ (-> sv-40 x) (fmax -4096.0 (fmin 4096.0 (-> v1-16 x)))))
-                            (set! (-> (the-as target s4-0) control trans z) (+ (-> sv-40 z) (fmax -4096.0 (fmin 4096.0 (-> v1-16 z)))))))))
+                       ;; og:preserve-this PAL patch here
+                       (when (< (vector-vector-xz-distance (-> (the-as target s4-0) control trans) sv-40) 20480.0)
+                         (let ((v1-16 (vector-! (new-stack-vector0) (-> (the-as target s4-0) control trans) sv-40)))
+                           (set! (-> (the-as target s4-0) control trans x) (+ (-> sv-40 x) (fmax -2867.2 (fmin 2867.2 (-> v1-16 x)))))
+                           (set! (-> (the-as target s4-0) control trans z) (+ (-> sv-40 z) (fmax -2867.2 (fmin 2867.2 (-> v1-16 z))))))))
                       (else
                        (if sv-44 (set! sv-32 (current-time)))
                        (set! sv-44 (the-as symbol #f))
