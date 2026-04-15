@@ -160,7 +160,7 @@
 (defmethod track-entered-region! ((this region-prim-area) (region-sphere drawable-region-sphere))
   "Enumerates through the objects `region-enter-list`, if we find the provided `region`, do nothing and exit
    otherwise, add the [[drawable-region-sphere]] to `region-enter-prim-list` and increment `region-enter-count`
-   
+
    @param region-sphere Defines the region in question
    @returns nothing"
   (let ((regions-entered (-> this region-enter-count)))
@@ -183,7 +183,7 @@
 (defmethod track-exited-region! ((this region-prim-area) (arg0 drawable-region-sphere))
   "Enumerates through the objects `region-exit-list`, if we find the provided `region`, do nothing and exit
    otherwise, add the [[drawable-region-sphere]] to `region-exit-prim-list` and increment `region-exit-count`
-   
+
    @param region-sphere Defines the region in question
    @returns nothing"
   (let ((regions-exited (-> this region-exit-count)))
@@ -206,7 +206,7 @@
 (defmethod track-inside-region! ((this region-prim-area) (arg0 drawable-region-sphere))
   "Enumerates through the objects `region-inside-list`, if we find the provided `region`, do nothing and exit
    otherwise, add the [[drawable-region-sphere]] to `region-inside-prim-list` and increment `region-inside-count`
-   
+
    @param region-sphere Defines the region in question
    @returns nothing"
   (let ((regions-inside (-> this region-inside-count)))
@@ -229,7 +229,7 @@
 (defmethod track-start-region! ((this region-prim-area) (arg0 drawable-region-sphere))
   "Enumerates through the objects `region-start-list`, if we find the provided `region`, do nothing and exit
    otherwise, add the [[drawable-region-sphere]] to `region-start-prim-list` and increment `region-start-count`
-   
+
    @param region-sphere Defines the region in question
    @returns nothing"
   (let ((regions-started (-> this region-start-count)))

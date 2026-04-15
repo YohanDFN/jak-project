@@ -81,7 +81,7 @@
 (defmethod compute-memory-usage! ((this level) (force? symbol))
   "Calculates the memory usage of the level, returns and stores the [[memory-usage-block]]
    in `mem-usage-block` as well as the total size in `mem-usage`
-   
+
    @param force? - Will re-compute the usage if set to [[#t]], even if `mem-usage` has been set to a non-zero value
    @returns The [[memory-usage-block]] representing the footprint of the level
    @see [[memory-usage-block::10]]"
