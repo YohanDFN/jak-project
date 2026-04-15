@@ -32,9 +32,11 @@
   )
 
 (defmethod update-values ((this hud-race-timer))
-  (set! (-> this values 0 target) (/ (the-as int (-> *game-info* race-timer)) #x4650))
-  (set! (-> this values 1 target) (/ (mod (the-as int (-> *game-info* race-timer)) #x4650) 300))
-  (set! (-> this values 2 target) (/ (mod (mod (the-as int (-> *game-info* race-timer)) #x4650) 300) 5))
+  (set! (-> this values 0 target) (/ (the-as int (-> *game-info* race-timer)) (seconds 60)))
+  (set! (-> this values 1 target) (/ (mod (the-as int (-> *game-info* race-timer)) (seconds 60)) (seconds 1)))
+  ;(set! (-> this values 2 target) (/ (mod (mod (the-as int (-> *game-info* race-timer)) (seconds 60)) (seconds 1)) (/ (seconds 1) 60)))
+  ;; og:preserve-this fix wrong hundredths counter...
+  (set! (-> this values 2 target) (/ (mod (mod (the-as int (-> *game-info* race-timer)) (seconds 60)) (seconds 1)) (seconds 0.01)))
   (logclear! (-> this flags) (hud-flags disable))
   ((method-of-type hud update-values) this)
   0
@@ -300,7 +302,8 @@
             ((zero? (-> s5-0 finish-count))
              (set! s0-0 80)
              (set-scale! s1-0 1.6)
-             (if (= (-> *setting-control* user-default language) (language-enum german))
+             ;; og:preserve-this text-language patch
+             (when (text-language? german)
                  (set-scale! s1-0 1.0)
                  )
              (print-game-text (lookup-text! *common-text* (text-id race-you-win) #f) s1-0 #f 44 (bucket-id progress))
@@ -308,7 +311,7 @@
             (else
               (set! s0-0 80)
               (set-scale! s1-0 1.6)
-              ;; og:preserve-this
+              ;; og:preserve-this text-language patch
               (if (text-language? german)
                   (set-scale! s1-0 1.0)
                   )
