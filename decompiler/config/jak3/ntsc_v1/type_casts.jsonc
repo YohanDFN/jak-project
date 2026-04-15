@@ -230,7 +230,11 @@
     [324, "v1", "(pointer uint64)"],
     [334, "v1", "(pointer uint64)"],
     [141, "v1", "int"],
-    [25, "v1", "dma-tag"]
+    [25, "v1", "dma-tag"],
+    ["_stack_", 16, "uint"],
+    ["_stack_", 32, "dma-packet"],
+    ["_stack_", 64, "dma-packet"],
+    ["_stack_", 80, "dma-packet"]
   ],
   "(method 3 connection-minimap)": [[97, "f0", "float"]],
   "dma-buffer-add-ref-texture": [
@@ -1307,7 +1311,8 @@
   "target-compute-edge": [[48, "a0", "process-drawable"]],
   "history-draw": [
     [16, "a1", "int"],
-    [151, "a0", "uint"]
+    [151, "a0", "uint"],
+    ["_stack_", 24, "float"]
   ],
   "history-print": [[20, "a1", "int"]],
   "target-collision-reaction": [
@@ -2119,7 +2124,11 @@
     ["_stack_", 16, "dma-packet"],
     [91, "v1", "dma-packet"]
   ],
-  "target-history-print": [["_stack_", 32, "collide-status"]],
+  "target-history-print": [
+    ["_stack_", 32, "collide-status"],
+    ["_stack_", 68, "float"],
+    ["_stack_", 40, "float"]
+  ],
   "(method 13 sync-linear)": [
     ["_stack_", 16, "res-tag"],
     [27, "v0", "(pointer float)"]
@@ -11314,7 +11323,10 @@
     [[174, 177], "v1", "dma-gif-packet"],
     [[186, 202], "a0", "(inline-array vector4w)"]
   ],
-  "draw-raw-image": [[[104, 154], "v1", "(inline-array vector4w)"]],
+  "draw-raw-image": [
+    [[104, 154], "v1", "(inline-array vector4w)"],
+    [[195, 198], "v1", "dma-packet"]
+  ],
   "draw-color-bars": [
     [[11, 16], "v1", "dma-gif-packet"],
     [[28, 54], "v1", "(inline-array vector4w)"]
@@ -11744,5 +11756,6 @@
     [6, "a0", "timer-bank"],
     [24, "a0", "timer-bank"],
     [1, "v1", "timer-bank"]
-  ]
+  ],
+  "(method 11 blow-tower-path-cursor)": [["_stack_", 52, "float"]]
 }
