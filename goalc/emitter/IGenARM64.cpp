@@ -23,8 +23,7 @@ using namespace emitter::ARM64;
 
 InstructionARM64 mov_gpr64_gpr64(Register dst, Register src) {
   // https://www.scs.stanford.edu/~zyedidia/arm64/mov_orr_log_shift.html
-  // sf	0	1	0	1	0	1	0	0	0	0	Rm	0
-  // 0	0	0	0	0	1	1	1	1	1	Rd MOV <Xd>, <Xm>
+  // MOV <Xd>, <Xm>
   ASSERT(dst.is_gpr(instr_set));
   ASSERT(src.is_gpr(instr_set));
   return InstructionARM64(Base(0b10101010000, 11), Rm(src.id()), Rn(0b11111), Rd(dst.id()),
@@ -32,50 +31,79 @@ InstructionARM64 mov_gpr64_gpr64(Register dst, Register src) {
 }
 
 InstructionARM64 mov_gpr64_u64(Register dst, uint64_t val) {
-  // TODO - cannot be done in a single arm64 instruction
-  // multiple https://www.scs.stanford.edu/~zyedidia/arm64/movk.html are needed
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+  // Cannot be done in a single instruction, must combine multiple MOVZ/MOVKs
+  std::vector<InstructionARM64> instrs;
+  bool emitted_movz = false;
+  for (int i = 0; i < 4; i++) {
+    u16 chunk = (val >> (i * 16)) & 0xFFFF;
+    if (!emitted_movz && chunk != 0) {
+      // https://www.scs.stanford.edu/~zyedidia/arm64/movz.html
+      // MOVZ <Xd>, #<imm>{, LSL #<shift>/16}
+      instrs.emplace_back(
+          InstructionARM64(Base(0b110100101, 9), Hw(i), Imm16(chunk), Rd(dst.id())));
+      emitted_movz = true;
+    } else if (emitted_movz && chunk != 0) {
+      // https://www.scs.stanford.edu/~zyedidia/arm64/movk.html
+      // MOVK <Xd>, #<imm>{, LSL #<shift>/16}
+      instrs.emplace_back(
+          InstructionARM64(Base(0b111100101, 9), Hw(i), Imm16(chunk), Rd(dst.id())));
+    }
+  }
+  if (!emitted_movz) {
+    // https://www.scs.stanford.edu/~zyedidia/arm64/movz.html
+    // MOVZ <Xd>, #<imm>{, LSL #0}
+    instrs.emplace_back(InstructionARM64(Base(0b110100101, 9), Hw(0), Imm16(0), Rd(dst.id())));
+  }
+  return InstructionARM64(instrs);
 }
 
 InstructionARM64 mov_gpr64_u32(Register dst, uint64_t val) {
-  // TODO - cannot be done in a single arm64 instruction
-  // multiple https://www.scs.stanford.edu/~zyedidia/arm64/movk.html are needed
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+  return mov_gpr64_u64(dst, val);
 }
 
 InstructionARM64 mov_gpr64_s32(Register dst, int64_t val) {
-  // TODO - cannot be done in a single arm64 instruction
-  // multiple https://www.scs.stanford.edu/~zyedidia/arm64/movk.html are needed
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+  // preserve sign -- but we are are simply moving the bits
+  u64 raw_val = static_cast<u64>(val);  // via int64_t → sign already there
+  return mov_gpr64_u64(dst, raw_val);
 }
 
-// TODO - should these be make generic to simdX?
-InstructionARM64 movd_gpr32_xmm32(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 movd_gpr32_f32(Register dst, Register src) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/fmov_float_gen.html
+  // Single-precision to 32-bit (sf == 0 && ftype == 00 && rmode == 00 && opcode == 110)
+  // FMOV <Wd>, <Sn>
+  ASSERT(dst.is_gpr(instr_set));
+  return InstructionARM64(Base(0b0001111000100110000000, 22), Rn(src.id()), Rd(dst.id()));
 }
 
-InstructionARM64 movd_xmm32_gpr32(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 movd_f32_gpr32(Register dst, Register src) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/fmov_float_gen.html
+  // 32-bit to single-precision (sf == 0 && ftype == 00 && rmode == 00 && opcode == 111)
+  // FMOV <Sd>, <Wn>
+  ASSERT(src.is_gpr(instr_set));
+  return InstructionARM64(Base(0b0001111000100111000000, 22), Rn(src.id()), Rd(dst.id()));
 }
 
-InstructionARM64 movq_gpr64_xmm64(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 movq_gpr64_f64(Register dst, Register src) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/fmov_float_gen.html
+  // Double-precision to 64-bit (sf == 1 && ftype == 01 && rmode == 00 && opcode == 110)
+  // FMOV <Xd>, <Dn>
+  ASSERT(dst.is_gpr(instr_set));
+  return InstructionARM64(Base(0b1001111001100110000000, 22), Rn(src.id()), Rd(dst.id()));
 }
 
-InstructionARM64 movq_xmm64_gpr64(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 movq_f64_gpr64(Register dst, Register src) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/fmov_float_gen.html
+  // 64-bit to double-precision (sf == 1 && ftype == 01 && rmode == 00 && opcode == 111)
+  // FMOV <Xd>, <Dn>
+  ASSERT(src.is_gpr(instr_set));
+  return InstructionARM64(Base(0b1001111001100111000000, 22), Rn(src.id()), Rd(dst.id()));
 }
 
-InstructionARM64 mov_xmm32_xmm32(Register dst, Register src) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 mov_f32_f32(Register dst, Register src) {
+  // https://www.scs.stanford.edu/~zyedidia/arm64/fmov_float.html
+  // Single-precision (ftype == 00)
+  // FMOV <Sd>, <Sn>
+  return InstructionARM64(Base(0b0001111000100000010000, 22), Rn(src.id()), Rd(dst.id()));
 }
 
 // todo - GPR64 -> XMM64 (zext)
@@ -505,83 +533,179 @@ InstructionARM64 store128_xmm128_reg_offset(Register base, Register xmm_val, s64
 }
 
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-//   RIP loads and stores
+//   PC relative loads and stores
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-InstructionARM64 load64_rip_s32(Register dest, s64 offset) {
+// Implement with LDR but that has a 1MB range limit on ARM (not 2GB like on x86)
+// Hopefully this is fine, however it could potentially not be if this is loading static data, which
+// may not within 1MB of the current instruction -- that all depends on the linker layout.
+//
+// TODO ARM - But keep it simple at first, add good assertions and we'll see what happens when we
+// compile for real.
+
+const int ARM64_LDR_MIN = -(1 << 18) * 4;
+const int ARM64_LDR_MAX = ((1 << 18) - 1) * 4;
+
+InstructionARM64 load64_pcRel_s32(Register dest, s64 offset) {
+  ASSERT(dest.is_gpr(instr_set));
+  ASSERT_MSG(offset >= ARM64_LDR_MIN && offset <= ARM64_LDR_MAX,
+             "PC Relative offset is too large for ARM64, fix it.");
+  // https://www.scs.stanford.edu/~zyedidia/arm64/ldr_lit_gen.html
+  // LDR <Xt>, <label>
+  return InstructionARM64(Base(0b01011000, 8), Imm19(offset / 4), Rt(dest.id()));
+}
+
+InstructionARM64 load32s_pcRel_s32(Register dest, s64 offset) {
+  ASSERT(dest.is_gpr(instr_set));
+  ASSERT_MSG(offset >= ARM64_LDR_MIN && offset <= ARM64_LDR_MAX,
+             "PC Relative offset is too large for ARM64, fix it.");
+  // https://www.scs.stanford.edu/~zyedidia/arm64/ldrsw_lit.html
+  // LDRSW <Xt>, <label>
+  return InstructionARM64(Base(0b10011000, 8), Imm19(offset / 4), Rt(dest.id()));
+}
+
+InstructionARM64 load32u_pcRel_s32(Register dest, s64 offset) {
+  ASSERT(dest.is_gpr(instr_set));
+  ASSERT_MSG(offset >= ARM64_LDR_MIN && offset <= ARM64_LDR_MAX,
+             "PC Relative offset is too large for ARM64, fix it.");
+  // https://www.scs.stanford.edu/~zyedidia/arm64/ldr_lit_gen.html
+  // LDR <Wt>, <label>
+  return InstructionARM64(Base(0b00011000, 8), Imm19(offset / 4), Rt(dest.id()));
+}
+
+// TODO ARM - 8/16 bit loads don't have a literal version, that means these
+// MUST use a temporary register.
+
+InstructionARM64 load16u_pcRel_s32(Register dest, s64 offset) {
+  ASSERT(dest.is_gpr(instr_set));
+  ASSERT_MSG(offset >= ARM64_LDR_MIN && offset <= ARM64_LDR_MAX,
+             "PC Relative offset is too large for ARM64, fix it.");
   ASSERT_MSG(false, "not yet implemented");
   return InstructionARM64(0b0);
 }
 
-InstructionARM64 load32s_rip_s32(Register dest, s64 offset) {
+InstructionARM64 load16s_pcRel_s32(Register dest, s64 offset) {
+  ASSERT(dest.is_gpr(instr_set));
+  ASSERT_MSG(offset >= ARM64_LDR_MIN && offset <= ARM64_LDR_MAX,
+             "PC Relative offset is too large for ARM64, fix it.");
   ASSERT_MSG(false, "not yet implemented");
   return InstructionARM64(0b0);
 }
 
-InstructionARM64 load32u_rip_s32(Register dest, s64 offset) {
+InstructionARM64 load8u_pcRel_s32(Register dest, s64 offset) {
+  ASSERT(dest.is_gpr(instr_set));
+  ASSERT_MSG(offset >= ARM64_LDR_MIN && offset <= ARM64_LDR_MAX,
+             "PC Relative offset is too large for ARM64, fix it.");
   ASSERT_MSG(false, "not yet implemented");
   return InstructionARM64(0b0);
 }
 
-InstructionARM64 load16u_rip_s32(Register dest, s64 offset) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
-}
-
-InstructionARM64 load16s_rip_s32(Register dest, s64 offset) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
-}
-
-InstructionARM64 load8u_rip_s32(Register dest, s64 offset) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
-}
-
-InstructionARM64 load8s_rip_s32(Register dest, s64 offset) {
+InstructionARM64 load8s_pcRel_s32(Register dest, s64 offset) {
+  ASSERT(dest.is_gpr(instr_set));
+  ASSERT_MSG(offset >= ARM64_LDR_MIN && offset <= ARM64_LDR_MAX,
+             "PC Relative offset is too large for ARM64, fix it.");
   ASSERT_MSG(false, "not yet implemented");
   return InstructionARM64(0b0);
 }
 
 InstructionARM64 static_load(Register dest, s64 offset, int size, bool sign_extend) {
+  switch (size) {
+    case 1:
+      if (sign_extend) {
+        return load8s_pcRel_s32(dest, offset);
+      } else {
+        return load8u_pcRel_s32(dest, offset);
+      }
+      break;
+    case 2:
+      if (sign_extend) {
+        return load16s_pcRel_s32(dest, offset);
+      } else {
+        return load16u_pcRel_s32(dest, offset);
+      }
+      break;
+    case 4:
+      if (sign_extend) {
+        return load8s_pcRel_s32(dest, offset);
+      } else {
+        return load8u_pcRel_s32(dest, offset);
+      }
+      break;
+    case 8:
+      return load8s_pcRel_s32(dest, offset);
+    default:
+      ASSERT(false);
+  }
+}
+
+// TODO ARM - no direct store instructions, gotta be two and involve a register
+
+InstructionARM64 store64_pcRel_s32(Register src, s64 offset) {
+  ASSERT(src.is_gpr(instr_set));
+  ASSERT_MSG(offset >= ARM64_LDR_MIN && offset <= ARM64_LDR_MAX,
+             "PC Relative offset is too large for ARM64, fix it.");
   ASSERT_MSG(false, "not yet implemented");
   return InstructionARM64(0b0);
 }
 
-InstructionARM64 store64_rip_s32(Register src, s64 offset) {
+InstructionARM64 store32_pcRel_s32(Register src, s64 offset) {
+  ASSERT(src.is_gpr(instr_set));
+  ASSERT_MSG(offset >= ARM64_LDR_MIN && offset <= ARM64_LDR_MAX,
+             "PC Relative offset is too large for ARM64, fix it.");
   ASSERT_MSG(false, "not yet implemented");
   return InstructionARM64(0b0);
 }
 
-InstructionARM64 store32_rip_s32(Register src, s64 offset) {
+InstructionARM64 store16_pcRel_s32(Register src, s64 offset) {
+  ASSERT(src.is_gpr(instr_set));
+  ASSERT_MSG(offset >= ARM64_LDR_MIN && offset <= ARM64_LDR_MAX,
+             "PC Relative offset is too large for ARM64, fix it.");
   ASSERT_MSG(false, "not yet implemented");
   return InstructionARM64(0b0);
 }
 
-InstructionARM64 store16_rip_s32(Register src, s64 offset) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
-}
-
-InstructionARM64 store8_rip_s32(Register src, s64 offset) {
+InstructionARM64 store8_pcRel_s32(Register src, s64 offset) {
+  ASSERT(src.is_gpr(instr_set));
+  ASSERT_MSG(offset >= ARM64_LDR_MIN && offset <= ARM64_LDR_MAX,
+             "PC Relative offset is too large for ARM64, fix it.");
   ASSERT_MSG(false, "not yet implemented");
   return InstructionARM64(0b0);
 }
 
 InstructionARM64 static_store(Register value, s64 offset, int size) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+  switch (size) {
+    case 1:
+      return store8_pcRel_s32(value, offset);
+    case 2:
+      return store16_pcRel_s32(value, offset);
+    case 4:
+      return store32_pcRel_s32(value, offset);
+    case 8:
+      return store64_pcRel_s32(value, offset);
+    default:
+      ASSERT(false);
+  }
 }
 
-InstructionARM64 static_addr(Register dst, s64 offset) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 static_addr(Register dest, s64 offset) {
+  ASSERT(dest.is_gpr(instr_set));
+  ASSERT_MSG(offset >= ARM64_LDR_MIN && offset <= ARM64_LDR_MAX,
+             "PC Relative offset is too large for ARM64, fix it.");
+  // https://www.scs.stanford.edu/~zyedidia/arm64/ldr_lit_gen.html
+  // LDR <Xt>, <label>
+  return InstructionARM64(Base(0b01011000, 8), Imm19(offset / 4), Rt(dest.id()));
 }
 
-InstructionARM64 static_load_xmm32(Register simd_dest, s64 offset) {
-  ASSERT_MSG(false, "not yet implemented");
-  return InstructionARM64(0b0);
+InstructionARM64 static_load_fp32(Register simd_dest, s64 offset) {
+  ASSERT(simd_dest.is_gpr(instr_set));
+  ASSERT_MSG(offset >= ARM64_LDR_MIN && offset <= ARM64_LDR_MAX,
+             "PC Relative offset is too large for ARM64, fix it.");
+  // https://www.scs.stanford.edu/~zyedidia/arm64/ldr_lit_fpsimd.html
+  // LDR <St>, <label>
+  return InstructionARM64(Base(0b00011100, 8), Imm19(offset / 4), Rt(simd_dest.id()));
 }
+
+// TODO ARM - no direct store instructions, gotta be two and involve a register
 
 InstructionARM64 static_store_xmm32(Register xmm_value, s64 offset) {
   ASSERT_MSG(false, "not yet implemented");

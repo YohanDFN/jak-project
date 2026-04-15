@@ -81,8 +81,11 @@ enum ARM64_REG : s8 {
   X13,  // temp, not-saved
   X14,  // temp, not-saved
   X15,  // temp, not-saved
-  X16,  // temp, not-saved
-  X17,  // temp, not-saved
+  // temp, not-saved - Conventionally used for linker/veneer/temporary values (we will reserve this
+  // one atleast)
+  X16,
+  // temp, not-saved - Conventionally used for linker/veneer/temporary values
+  X17,
   X18,  // temp, not-saved
 
   X19,  // saved TODO purpose?, R12

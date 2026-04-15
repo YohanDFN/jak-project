@@ -32,23 +32,23 @@ Instruction mov_gpr64_s32(const ObjectGenerator& gen, Register dst, int64_t val)
 }
 
 Instruction movd_gpr32_xmm32(const ObjectGenerator& gen, Register dst, Register src) {
-  IGEN_DISPATCH(movd_gpr32_xmm32, dst, src);
+  IGEN_DISPATCH(movd_gpr32_f32, dst, src);
 }
 
 Instruction movd_xmm32_gpr32(const ObjectGenerator& gen, Register dst, Register src) {
-  IGEN_DISPATCH(movd_xmm32_gpr32, dst, src);
+  IGEN_DISPATCH(movd_f32_gpr32, dst, src);
 }
 
 Instruction movq_gpr64_xmm64(const ObjectGenerator& gen, Register dst, Register src) {
-  IGEN_DISPATCH(movq_gpr64_xmm64, dst, src);
+  IGEN_DISPATCH(movq_gpr64_f64, dst, src);
 }
 
 Instruction movq_xmm64_gpr64(const ObjectGenerator& gen, Register dst, Register src) {
-  IGEN_DISPATCH(movq_xmm64_gpr64, dst, src);
+  IGEN_DISPATCH(movq_f64_gpr64, dst, src);
 }
 
 Instruction mov_xmm32_xmm32(const ObjectGenerator& gen, Register dst, Register src) {
-  IGEN_DISPATCH(mov_xmm32_xmm32, dst, src);
+  IGEN_DISPATCH(mov_f32_f32, dst, src);
 }
 
 Instruction load8s_gpr64_gpr64_plus_gpr64(const ObjectGenerator& gen,
@@ -516,31 +516,31 @@ Instruction store128_xmm128_reg_offset(const ObjectGenerator& gen,
 }
 
 Instruction load64_rip_s32(const ObjectGenerator& gen, Register dest, s64 offset) {
-  IGEN_DISPATCH(load64_rip_s32, dest, offset);
+  IGEN_DISPATCH(load64_pcRel_s32, dest, offset);
 }
 
 Instruction load32s_rip_s32(const ObjectGenerator& gen, Register dest, s64 offset) {
-  IGEN_DISPATCH(load32s_rip_s32, dest, offset);
+  IGEN_DISPATCH(load32s_pcRel_s32, dest, offset);
 }
 
 Instruction load32u_rip_s32(const ObjectGenerator& gen, Register dest, s64 offset) {
-  IGEN_DISPATCH(load32u_rip_s32, dest, offset);
+  IGEN_DISPATCH(load32u_pcRel_s32, dest, offset);
 }
 
 Instruction load16u_rip_s32(const ObjectGenerator& gen, Register dest, s64 offset) {
-  IGEN_DISPATCH(load16u_rip_s32, dest, offset);
+  IGEN_DISPATCH(load16u_pcRel_s32, dest, offset);
 }
 
 Instruction load16s_rip_s32(const ObjectGenerator& gen, Register dest, s64 offset) {
-  IGEN_DISPATCH(load16s_rip_s32, dest, offset);
+  IGEN_DISPATCH(load16s_pcRel_s32, dest, offset);
 }
 
 Instruction load8u_rip_s32(const ObjectGenerator& gen, Register dest, s64 offset) {
-  IGEN_DISPATCH(load8u_rip_s32, dest, offset);
+  IGEN_DISPATCH(load8u_pcRel_s32, dest, offset);
 }
 
 Instruction load8s_rip_s32(const ObjectGenerator& gen, Register dest, s64 offset) {
-  IGEN_DISPATCH(load8s_rip_s32, dest, offset);
+  IGEN_DISPATCH(load8s_pcRel_s32, dest, offset);
 }
 
 Instruction static_load(const ObjectGenerator& gen,
@@ -552,19 +552,19 @@ Instruction static_load(const ObjectGenerator& gen,
 }
 
 Instruction store64_rip_s32(const ObjectGenerator& gen, Register src, s64 offset) {
-  IGEN_DISPATCH(store64_rip_s32, src, offset);
+  IGEN_DISPATCH(store64_pcRel_s32, src, offset);
 }
 
 Instruction store32_rip_s32(const ObjectGenerator& gen, Register src, s64 offset) {
-  IGEN_DISPATCH(store32_rip_s32, src, offset);
+  IGEN_DISPATCH(store32_pcRel_s32, src, offset);
 }
 
 Instruction store16_rip_s32(const ObjectGenerator& gen, Register src, s64 offset) {
-  IGEN_DISPATCH(store16_rip_s32, src, offset);
+  IGEN_DISPATCH(store16_pcRel_s32, src, offset);
 }
 
 Instruction store8_rip_s32(const ObjectGenerator& gen, Register src, s64 offset) {
-  IGEN_DISPATCH(store8_rip_s32, src, offset);
+  IGEN_DISPATCH(store8_pcRel_s32, src, offset);
 }
 
 Instruction static_store(const ObjectGenerator& gen, Register value, s64 offset, int size) {
@@ -576,7 +576,7 @@ Instruction static_addr(const ObjectGenerator& gen, Register dst, s64 offset) {
 }
 
 Instruction static_load_xmm32(const ObjectGenerator& gen, Register simd_dest, s64 offset) {
-  IGEN_DISPATCH(static_load_xmm32, simd_dest, offset);
+  IGEN_DISPATCH(static_load_fp32, simd_dest, offset);
 }
 
 Instruction static_store_xmm32(const ObjectGenerator& gen, Register xmm_value, s64 offset) {

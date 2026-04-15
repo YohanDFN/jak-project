@@ -34,27 +34,27 @@ InstructionARM64 mov_gpr64_s32(Register dst, int64_t val);
 /*!
  * Move 32-bits of xmm to 32 bits of gpr (no sign extension).
  */
-InstructionARM64 movd_gpr32_xmm32(Register dst, Register src);
+InstructionARM64 movd_gpr32_f32(Register dst, Register src);
 
 /*!
  * Move 32-bits of gpr to 32-bits of xmm (no sign extension)
  */
-InstructionARM64 movd_xmm32_gpr32(Register dst, Register src);
+InstructionARM64 movd_f32_gpr32(Register dst, Register src);
 
 /*!
  * Move 64-bits of xmm to 64 bits of gpr (no sign extension).
  */
-InstructionARM64 movq_gpr64_xmm64(Register dst, Register src);
+InstructionARM64 movq_gpr64_f64(Register dst, Register src);
 
 /*!
  * Move 64-bits of gpr to 64-bits of xmm (no sign extension)
  */
-InstructionARM64 movq_xmm64_gpr64(Register dst, Register src);
+InstructionARM64 movq_f64_gpr64(Register dst, Register src);
 
 /*!
  * Move 32-bits between xmm's
  */
-InstructionARM64 mov_xmm32_xmm32(Register dst, Register src);
+InstructionARM64 mov_f32_f32(Register dst, Register src);
 
 // todo - GPR64 -> XMM64 (zext)
 // todo - XMM -> GPR64
@@ -323,35 +323,35 @@ InstructionARM64 store128_xmm128_reg_offset(Register base, Register xmm_val, s64
 //   RIP loads and stores
 //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-InstructionARM64 load64_rip_s32(Register dest, s64 offset);
+InstructionARM64 load64_pcRel_s32(Register dest, s64 offset);
 
-InstructionARM64 load32s_rip_s32(Register dest, s64 offset);
+InstructionARM64 load32s_pcRel_s32(Register dest, s64 offset);
 
-InstructionARM64 load32u_rip_s32(Register dest, s64 offset);
+InstructionARM64 load32u_pcRel_s32(Register dest, s64 offset);
 
-InstructionARM64 load16u_rip_s32(Register dest, s64 offset);
+InstructionARM64 load16u_pcRel_s32(Register dest, s64 offset);
 
-InstructionARM64 load16s_rip_s32(Register dest, s64 offset);
+InstructionARM64 load16s_pcRel_s32(Register dest, s64 offset);
 
-InstructionARM64 load8u_rip_s32(Register dest, s64 offset);
+InstructionARM64 load8u_pcRel_s32(Register dest, s64 offset);
 
-InstructionARM64 load8s_rip_s32(Register dest, s64 offset);
+InstructionARM64 load8s_pcRel_s32(Register dest, s64 offset);
 
 InstructionARM64 static_load(Register dest, s64 offset, int size, bool sign_extend);
 
-InstructionARM64 store64_rip_s32(Register src, s64 offset);
+InstructionARM64 store64_pcRel_s32(Register src, s64 offset);
 
-InstructionARM64 store32_rip_s32(Register src, s64 offset);
+InstructionARM64 store32_pcRel_s32(Register src, s64 offset);
 
-InstructionARM64 store16_rip_s32(Register src, s64 offset);
+InstructionARM64 store16_pcRel_s32(Register src, s64 offset);
 
-InstructionARM64 store8_rip_s32(Register src, s64 offset);
+InstructionARM64 store8_pcRel_s32(Register src, s64 offset);
 
 InstructionARM64 static_store(Register value, s64 offset, int size);
 
 InstructionARM64 static_addr(Register dst, s64 offset);
 
-InstructionARM64 static_load_xmm32(Register simd_dest, s64 offset);
+InstructionARM64 static_load_fp32(Register simd_dest, s64 offset);
 
 InstructionARM64 static_store_xmm32(Register xmm_value, s64 offset);
 

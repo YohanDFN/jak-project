@@ -45,53 +45,68 @@ constexpr u32 Base(u32 value, u32 width) {
   return value << (32 - width);
 }
 
+// TODO NOW - fix below
+constexpr u64 pow2(u64 n) {
+  return 1ull << n;
+}
+
+constexpr Field Hw(u32 x) {
+  ASSERT(x >= 0 && x <= (4 - 1));
+  return Field{(x & 4) << 21};
+}
+
 constexpr Field Sh(u32 x) {
-  ASSERT(x >= 0 && x <= ((2 ^ 1) - 1));
+  ASSERT(x >= 0 && x <= (2 - 1));
   return Field{(x & 1) << 22};
 }
 
 constexpr Field Shift(u32 x) {
-  ASSERT(x >= 0 && x <= ((2 ^ 2) - 1));
-  return Field{(x & 1) << 22};
+  ASSERT(x >= 0 && x <= (4 - 1));
+  return Field{(x & 2) << 22};
 }
 
 constexpr Field Rd(u32 x) {
-  ASSERT(x >= 0 && x <= ((2 ^ 5) - 1));
+  ASSERT(x >= 0 && x <= (32 - 1));
   return Field{(x & 31) << 0};
 }
 
 constexpr Field Rt(u32 x) {
-  ASSERT(x >= 0 && x <= ((2 ^ 5) - 1));
+  ASSERT(x >= 0 && x <= (32 - 1));
   return Field{(x & 31) << 0};
 }
 
 constexpr Field Rn(u32 x) {
-  ASSERT(x >= 0 && x <= ((2 ^ 5) - 1));
+  ASSERT(x >= 0 && x <= (32 - 1));
   return Field{(x & 31) << 5};
 }
 
 constexpr Field Rm(u32 x) {
-  ASSERT(x >= 0 && x <= ((2 ^ 5) - 1));
+  ASSERT(x >= 0 && x <= (32 - 1));
   return Field{(x & 31) << 16};
 }
 
 constexpr Field Imm6(u32 x) {
-  ASSERT(x >= 0 && x <= ((2 ^ 6) - 1));
+  ASSERT(x >= 0 && x <= (64 - 1));
   return Field{(x & 0b111111) << 10};
 }
 
 constexpr Field Imm9(s32 x) {
-  ASSERT(x >= 0 && x <= ((2 ^ 9) - 1));
-  return Field{(static_cast<uint32_t>(x) & 0b111111111) << 12};
+  ASSERT(x >= 0 && x <= (512 - 1));
+  return Field{(static_cast<u32>(x) & 0b111111111) << 12};
 }
 
 constexpr Field Imm12(u32 x) {
-  ASSERT(x >= 0 && x <= ((2 ^ 12) - 1));
-  return Field{(static_cast<uint32_t>(x) & 0b111111111111) << 10};
+  ASSERT(x >= 0 && x <= (4096 - 1));
+  return Field{(static_cast<u32>(x) & 0b111111111111) << 10};
+}
+
+constexpr Field Imm16(u32 x) {
+  ASSERT(x >= 0 && x <= (pow2(16) - 1));
+  return Field{static_cast<u32>((x & (pow2(16) - 1)) << 16)};
 }
 
 constexpr Field Imm26(u32 x) {
-  ASSERT(x >= 0 && x <= ((2 ^ 26) - 1));
+  ASSERT(x >= 0 && x <= (67108864 - 1));
   return Field{(static_cast<uint32_t>(x) & 0b11111111111111111111111111) << 0};
 }
 
