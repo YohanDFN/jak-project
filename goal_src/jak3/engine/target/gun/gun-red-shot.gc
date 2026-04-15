@@ -588,6 +588,8 @@
                 (when s3-1
                   (when (and (!= *target* s3-1)
                              (not (focus-test? (the-as process-focusable s3-1) disable dead inactive))
+                             ;; og:preserve-this
+                             (pc-check-focus-fix s3-1)
                              (or (logtest? (process-mask crate enemy vehicle civilian) (-> s3-1 mask))
                                  (and (logtest? (process-mask guard) (-> s3-1 mask)) (-> *setting-control* user-current gun-target-guards?))
                                  )
@@ -1584,6 +1586,8 @@
                         (when s1-1
                           (when (and (!= *target* s1-1)
                                      (not (focus-test? (the-as process-focusable s1-1) disable dead inactive gun-no-target))
+                                     ;; og:preserve-this
+                                     (pc-check-focus-fix s1-1)
                                      (or (logtest? (process-mask crate enemy vehicle civilian) (-> s1-1 mask))
                                          (and (logtest? (process-mask guard) (-> s1-1 mask)) (-> *setting-control* user-current gun-target-guards?))
                                          )

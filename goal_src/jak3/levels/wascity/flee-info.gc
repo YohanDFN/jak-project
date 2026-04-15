@@ -42,7 +42,8 @@
             (+! sv-32 1)
             )
           )
-        (set! arg4 (+ s0-0 (the float (/ (the int f30-0) s1-0))))
+        ;; og:preserve-this fix divide by zero
+        (set! arg4 (+ s0-0 (the float (/-signed-0-guard (the int f30-0) s1-0))))
         )
       )
     )

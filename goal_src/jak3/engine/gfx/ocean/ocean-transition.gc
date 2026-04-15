@@ -652,7 +652,8 @@
             (while (>= s1-0 s2-0)
               (set! (-> sv-36 x) (+ 49152.0 (* 98304.0 (the float s2-0)) (-> this start-corner x)))
               (set! (-> sv-36 z) (+ 49152.0 (* 98304.0 (the float s4-0)) (-> this start-corner z)))
-              (when (sphere-cull sv-36)
+              ;; og:preserve-this
+              (when (sphere-cull-for-ocean sv-36)
                 (if (not (ocean-trans-camera-masks-bit? this s4-0 s2-0))
                     (ocean-trans-add-upload this arg0 s4-0 s2-0)
                     )
