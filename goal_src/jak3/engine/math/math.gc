@@ -13,6 +13,9 @@
 (defmacro square (x)
   `(* ,x ,x))
 
+(defmacro is-nan? (flt)
+  `(and (< 0.0 ,flt) (< ,flt 0.0)))
+
 ;; DECOMP BEGINS
 
 (defun truncate ((arg0 float))
