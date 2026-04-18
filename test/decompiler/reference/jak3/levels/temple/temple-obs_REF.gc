@@ -1172,9 +1172,10 @@
 
 ;; definition for method 11 of type tpl-holo-eye
 ;; INFO: Used lq/sq
+;; INFO: Process stack size was changed from 320 to 384
 (defmethod init-from-entity! ((this tpl-holo-eye) (arg0 entity-actor))
   "Set up a newly created process from the entity that created it."
-  (stack-size-set! (-> this main-thread) 320)
+  (stack-size-set! (-> this main-thread) 384)
   (set! (-> this root) (new 'process 'trsqv))
   (process-drawable-from-entity! this arg0)
   (initialize-skeleton
