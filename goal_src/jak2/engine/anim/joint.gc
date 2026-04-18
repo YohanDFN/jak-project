@@ -2046,10 +2046,25 @@
 
 (def-mips2c calc-animation-from-spr (function joint-anim-frame int none))
 
-(defun create-interpolated-joint-animation-frame ((dst joint-anim-frame) (num-joints int) (jc joint-control))
-  (flatten-joint-control-to-spr jc)
-  (make-joint-jump-tables)
-  (calc-animation-from-spr dst num-joints)
+;; og:preserve-this
+(defun create-interpolated-joint-animation-frame ((output-frame joint-anim-frame) (arg1 int) (arg2 joint-control))
+  (let ((start (get-cpu-clock)))
+    (cond
+      (*use-new-decompressor*
+
+        (new-joint-decompressor output-frame arg1 arg2)
+
+        )
+      (else
+        (flatten-joint-control-to-spr arg2)
+        (make-joint-jump-tables)
+        (calc-animation-from-spr output-frame arg1)
+        )
+      )
+    (+! (-> *new-joint-decompressor-stats* total-time)
+        (the int (* 1000000. (cpu-ticks-to-seconds (- (get-cpu-clock) start))))
+        )
+    )
   0
   )
 

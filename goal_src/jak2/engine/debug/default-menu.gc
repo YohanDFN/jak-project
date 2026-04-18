@@ -2682,10 +2682,11 @@
                         (logtest? (continue-flags test) (-> (the-as continue-point v1-2) flags))
                         #t
                         )
-                    (set! s5-0 (cons
-                                 (cons 'flag (cons
+                    ;; og:preserve-this cons -> dcons
+                    (set! s5-0 (dcons
+                                 (dcons 'flag (dcons
                                                (-> (the-as continue-point v1-2) name)
-                                               (cons (-> (the-as continue-point v1-2) name) (cons 'dm-current-continue '()))
+                                               (dcons (-> (the-as continue-point v1-2) name) (dcons 'dm-current-continue '()))
                                                )
                                        )
                                  s5-0
@@ -2710,7 +2711,7 @@
           )
         )
       ;; og:preserve-this cons -> dcons
-      (dcons 'menu (cons (symbol->string arg1) a3-5))
+      (dcons 'menu (dcons (symbol->string arg1) a3-5))
       )
     )
   )
