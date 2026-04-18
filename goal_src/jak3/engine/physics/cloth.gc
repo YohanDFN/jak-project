@@ -276,6 +276,12 @@
            (s2-0 583)
            )
       (format (clear *temp-string*) "~d" s5-0)
+      ;; og:preserve-this added
+      (add-debug-sphere #t (the-as bucket-id s2-0)
+                              (-> this particles data s5-0 pos)
+                              (meters 0.02)
+                              (static-rgba #x80 0 #x80 #x80)
+                              )
       (s4-0
         s3-0
         (the-as bucket-id s2-0)

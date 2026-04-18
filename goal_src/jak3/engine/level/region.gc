@@ -77,7 +77,8 @@
   (let ((sv-32 (new 'stack 'vector2h))
         (sv-36 (-> this bsphere))
         )
-    (add-debug-x #t (bucket-id debug-no-zbuf1) sv-36 (new 'static 'rgba :r #xff :g #xff :a #x80))
+    ;; og:preserve-this
+    (add-debug-x #t (bucket-id debug-no-zbuf1) sv-36 (#if PC_PORT (region-enter-color #x80) (new 'static 'rgba :r #xff :g #xff :a #x80)))
     (when (nonzero? (-> this region))
       (let ((s5-0 add-debug-text-3d)
             (s4-0 #t)
