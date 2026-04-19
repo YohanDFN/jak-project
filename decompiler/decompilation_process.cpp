@@ -130,7 +130,7 @@ int run_decompilation_process(decompiler::Config config,
   // print disassembly
   if (config.disassemble_code || config.disassemble_data) {
     db.write_disassembly(out_folder, config.disassemble_data, config.disassemble_code,
-                         config.write_hex_near_instructions);
+                         config.write_hex_near_instructions, config.dump_function_metadata);
   }
 
   if (config.process_art_groups) {
