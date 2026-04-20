@@ -1124,6 +1124,7 @@ void ObjectFileDB::dump_art_info(const fs::path& output_dir) {
     ag_result += "\n";
   }
 
+  file_util::create_dir_if_needed_for_file(ag_fpath);
   file_util::write_text_file(ag_fpath, ag_result);
 
   auto jg_fpath = output_dir / "import" / "joint-nodes.gc";

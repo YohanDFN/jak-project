@@ -97,7 +97,7 @@ tasks:
   build-debug:
     desc: "Build the project using the generated CMake"
     cmds:
-      - "cmake {{.CMAKE_BUILD_DIR_DEBUG}} --parallel 8 --target goalc"
+      - "cmake {{.CMAKE_BUILD_DIR_DEBUG}} --parallel 8"
   repl:
     desc: "Start the REPL"
     preconditions:
