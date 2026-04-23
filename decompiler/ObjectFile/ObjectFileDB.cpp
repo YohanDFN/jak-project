@@ -633,13 +633,14 @@ void ObjectFileDB::write_disassembly(const fs::path& output_dir,
                                      bool disassemble_data,
                                      bool disassemble_code,
                                      bool print_hex,
-                                    bool dump_function_metadata) {
+                                     bool dump_function_metadata) {
   lg::info("- Writing functions...");
   Timer timer;
   uint32_t total_bytes = 0, total_files = 0;
 
   std::string asm_functions;
-  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> file_func_metadata_map = {};
+  std::unordered_map<std::string, std::unordered_map<std::string, std::string>>
+      file_func_metadata_map = {};
 
   for_each_obj([&](ObjectFileData& obj) {
     if (((obj.obj_version == 3 || (obj.obj_version == 5 && obj.linked_data.has_any_functions())) &&
@@ -648,7 +649,8 @@ void ObjectFileDB::write_disassembly(const fs::path& output_dir,
       auto file_text = obj.linked_data.print_disassembly(print_hex);
       if (dump_function_metadata) {
         if (!file_func_metadata_map.contains(obj.to_unique_name())) {
-          file_func_metadata_map[obj.to_unique_name()] = std::unordered_map<std::string, std::string>{};
+          file_func_metadata_map[obj.to_unique_name()] =
+              std::unordered_map<std::string, std::string>{};
         }
         obj.linked_data.dump_asm_function_metadata(file_func_metadata_map[obj.to_unique_name()]);
       }
@@ -766,6 +768,7 @@ std::string ObjectFileDB::process_tpages(TextureDB& tex_db,
       animated_slots = jak3_animated_texture_slots();
       break;
     case GameVersion::JakX:
+      // TODO jakx - Implement animation
       break;
     default:
       ASSERT_NOT_REACHED();

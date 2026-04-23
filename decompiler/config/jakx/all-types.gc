@@ -2301,7 +2301,7 @@
   :method-count-assert 22
   :size-assert         #x20
   :flag-assert         #x1600000020
-  ;; field extra uses ~A with a signed load. 
+  ;; field extra uses ~A with a signed load.
   (:methods
     (new (symbol type) _type_) ;; 0 ;; (new (symbol type int int) _type_)
     (res-lump-method-9 () none) ;; 9 ;; (get-property-data (_type_ symbol symbol float pointer (pointer res-tag) pointer) pointer)
@@ -5374,7 +5374,7 @@
   :method-count-assert 14
   :size-assert         #x20
   :flag-assert         #xe00000020
-  ;; field param1 uses ~A with a signed load. field param2 uses ~A with a signed load. field param3 uses ~A with a signed load. 
+  ;; field param1 uses ~A with a signed load. field param2 uses ~A with a signed load. field param3 uses ~A with a signed load.
   (:methods
     (connection-method-9 () none) ;; 9 ;; (get-engine (connection) engine)
     (connection-method-10 () none) ;; 10 ;; (get-process (connection) process)
@@ -5442,7 +5442,7 @@
   :method-count-assert 9
   :size-assert         #x20
   :flag-assert         #x900000020
-  ;; field key uses ~A with a signed load. 
+  ;; field key uses ~A with a signed load.
   )
 |#
 
@@ -6173,7 +6173,7 @@
   :method-count-assert 9
   :size-assert         #x40
   :flag-assert         #x900000040
-  ;; field key uses ~A with a signed load. 
+  ;; field key uses ~A with a signed load.
   )
 |#
 
@@ -6665,7 +6665,7 @@
   :method-count-assert 10
   :size-assert         #x2c
   :flag-assert         #xa0000002c
-  ;; field kiosk-play-continue uses ~A with a signed load. field kiosk-online-play-continue uses ~A with a signed load. 
+  ;; field kiosk-play-continue uses ~A with a signed load. field kiosk-online-play-continue uses ~A with a signed load.
   (:methods
     (game-task-info-method-9 () none) ;; 9 ;; (get-play-list-idx (_type_) int)
     )
@@ -8254,7 +8254,7 @@
   :method-count-assert 11
   :size-assert         #x190
   :flag-assert         #xb00000190
-  ;; field cam-slave-options is likely a value type. field cam-master-options is likely a value type. 
+  ;; field cam-slave-options is likely a value type. field cam-master-options is likely a value type.
   (:methods
     (cam-setting-data-method-9 () none) ;; 9 ;; (cam-setting-data-method-9 (_type_ engine engine-pers engine) _type_)
     (cam-setting-data-method-10 () none) ;; 10 ;; (cam-setting-data-method-10 (_type_ object (pointer process) float int) _type_)
@@ -9348,7 +9348,7 @@
   :method-count-assert 10
   :size-assert         #x20
   :flag-assert         #xa00000020
-  ;; field param1 uses ~A with a signed load. field param2 uses ~A with a signed load. 
+  ;; field param1 uses ~A with a signed load. field param2 uses ~A with a signed load.
   (:methods
     (new (symbol type) _type_) ;; 0 ;; (new (symbol type drawable) _type_)
     (cspace-method-9 () none) ;; 9 ;; (reset-and-assign-geo! (_type_ drawable) _type_)
@@ -9456,7 +9456,7 @@
   :method-count-assert 17
   :size-assert         #x20
   :flag-assert         #x1100000020
-  ;; field distance is a float printed as hex? 
+  ;; field distance is a float printed as hex?
   )
 |#
 
@@ -9531,7 +9531,7 @@
   :method-count-assert 10
   :size-assert         #x10
   :flag-assert         #xa00000010
-  ;; field on-enter uses ~A with a signed load. field on-inside uses ~A with a signed load. field on-exit uses ~A with a signed load. 
+  ;; field on-enter uses ~A with a signed load. field on-inside uses ~A with a signed load. field on-exit uses ~A with a signed load.
   (:methods
     (region-method-9 () none) ;; 9 ;; (point-in-region-debug! (_type_ vector) symbol)
     )
@@ -10233,7 +10233,7 @@
   :method-count-assert 14
   :size-assert         #x3c
   :flag-assert         #xe0000003c
-  ;; field blend-shape-anim uses ~A with a signed load. 
+  ;; field blend-shape-anim uses ~A with a signed load.
   )
 |#
 
@@ -10381,7 +10381,7 @@
   :method-count-assert 16
   :size-assert         #x104
   :flag-assert         #x1000000104
-  ;; field draw-control-global-effect is likely a value type. 
+  ;; field draw-control-global-effect is likely a value type.
   (:methods
     (new (symbol type) _type_) ;; 0 ;; (new (symbol type process symbol) _type_)
     (draw-control-method-9 () none) ;; 9 ;; (get-skeleton-origin (_type_) vector)
@@ -10818,7 +10818,7 @@
   :method-count-assert 9
   :size-assert         #x80
   :flag-assert         #x900000080
-  ;; field xyz-scale is a float printed as hex? 
+  ;; field xyz-scale is a float printed as hex?
   )
 |#
 
@@ -12051,7 +12051,7 @@
   :method-count-assert 12
   :size-assert         #x70
   :flag-assert         #xc00000070
-  ;; field on-goto uses ~A with a signed load. 
+  ;; field on-goto uses ~A with a signed load.
   (:methods
     (continue-point-method-9 () none) ;; 9 ;; (debug-draw (_type_) int)
     (continue-point-method-10 () none) ;; 10 ;; (continue-point-method-10 (_type_ load-state) continue-point)
@@ -12225,7 +12225,7 @@
   :method-count-assert 14
   :size-assert         #x40
   :flag-assert         #xe00000040
-  ;; field param1 uses ~A with a signed load. field param2 uses ~A with a signed load. field param3 uses ~A with a signed load. 
+  ;; field param1 uses ~A with a signed load. field param2 uses ~A with a signed load. field param3 uses ~A with a signed load.
   )
 |#
 
@@ -12256,7 +12256,7 @@
   :method-count-assert 14
   :size-assert         #x20
   :flag-assert         #xe00000020
-  ;; field on-close uses ~A with a signed load. 
+  ;; field on-close uses ~A with a signed load.
   (:methods
     (talker-speech-class-method-9 () none) ;; 9 ;; (should-play? (_type_) symbol)
     (talker-speech-class-method-10 () none) ;; 10 ;; (mark-played! (_type_) none)
@@ -12365,7 +12365,7 @@
   :method-count-assert 17
   :size-assert         #x94
   :flag-assert         #x1100000094
-  ;; field speech-channel-flag is likely a value type. 
+  ;; field speech-channel-flag is likely a value type.
   (:methods
     (speech-channel-method-9 () none) ;; 9 ;; (speech-channel-method-9 (_type_ process-drawable speech-type) int)
     (speech-channel-method-10 () none) ;; 10 ;; (speech-channel-method-10 (_type_ handle) none)
@@ -12783,7 +12783,7 @@
   :method-count-assert 13
   :size-assert         #x40
   :flag-assert         #xd00000040
-  ;; field joint-control-status is likely a value type. 
+  ;; field joint-control-status is likely a value type.
   (:methods
     (new (symbol type) _type_) ;; 0 ;; (new (symbol type int) _type_)
     (joint-control-method-9 () none) ;; 9 ;; (current-cycle-distance (_type_) float)
@@ -13145,7 +13145,7 @@
   :method-count-assert 14
   :size-assert         #xb0
   :flag-assert         #xe000000b0
-  ;; field param1 uses ~A with a signed load. field param2 uses ~A with a signed load. field param3 uses ~A with a signed load. 
+  ;; field param1 uses ~A with a signed load. field param2 uses ~A with a signed load. field param3 uses ~A with a signed load.
   )
 |#
 
@@ -13425,7 +13425,7 @@
   :method-count-assert 12
   :size-assert         #x28
   :flag-assert         #xc00000028
-  ;; field actor-option is likely a value type. 
+  ;; field actor-option is likely a value type.
   (:methods
     (new (symbol type) _type_) ;; 0 ;; (new (symbol type process pickup-type float) _type_)
     (fact-info-method-9 () none) ;; 9 ;; (drop-pickup (_type_ symbol process-tree fact-info int symbol) (pointer process))
@@ -13458,7 +13458,7 @@
   :method-count-assert 13
   :size-assert         #x53
   :flag-assert         #xd00000053
-  ;; field actor-option is likely a value type. 
+  ;; field actor-option is likely a value type.
   (:methods
     (new (symbol type) _type_) ;; 0 ;; (new (symbol type process (pointer float)) _type_)
     (fact-info-enemy-method-12 () none) ;; 12 ;; (clear-mask-bits (_type_ int) none)
@@ -13478,7 +13478,7 @@
   :method-count-assert 12
   :size-assert         #x2c
   :flag-assert         #xc0000002c
-  ;; field actor-option is likely a value type. 
+  ;; field actor-option is likely a value type.
   (:methods
     (new (symbol type) _type_) ;; 0 ;; (new (symbol type process pickup-type float) _type_)
     )
@@ -13572,7 +13572,7 @@
   :method-count-assert 9
   :size-assert         #x1c
   :flag-assert         #x90000001c
-  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -13584,7 +13584,7 @@
   :method-count-assert 9
   :size-assert         #x8
   :flag-assert         #x900000008
-  ;; field connection-handle uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load.
   )
 |#
 
@@ -13608,7 +13608,7 @@
   :method-count-assert 9
   :size-assert         #x8
   :flag-assert         #x900000008
-  ;; field p-data uses ~A with a signed load. 
+  ;; field p-data uses ~A with a signed load.
   )
 |#
 
@@ -13633,7 +13633,7 @@
   :method-count-assert 9
   :size-assert         #xc
   :flag-assert         #x90000000c
-  ;; field connection-handle uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load.
   )
 |#
 
@@ -13646,7 +13646,7 @@
   :method-count-assert 9
   :size-assert         #xc
   :flag-assert         #x90000000c
-  ;; field connection-handle uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load.
   )
 |#
 
@@ -13774,7 +13774,7 @@
   :method-count-assert 9
   :size-assert         #x14
   :flag-assert         #x900000014
-  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -13790,7 +13790,7 @@
   :method-count-assert 9
   :size-assert         #x18
   :flag-assert         #x900000018
-  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -13803,7 +13803,7 @@
   :method-count-assert 9
   :size-assert         #xc
   :flag-assert         #x90000000c
-  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -13818,7 +13818,7 @@
   :method-count-assert 9
   :size-assert         #x14
   :flag-assert         #x900000014
-  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -13831,7 +13831,7 @@
   :method-count-assert 9
   :size-assert         #xc
   :flag-assert         #x90000000c
-  ;; field p-token-ownership-notify-callback-data uses ~A with a signed load. 
+  ;; field p-token-ownership-notify-callback-data uses ~A with a signed load.
   )
 |#
 
@@ -13845,7 +13845,7 @@
   :method-count-assert 9
   :size-assert         #x10
   :flag-assert         #x900000010
-  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -13861,7 +13861,7 @@
   :method-count-assert 9
   :size-assert         #x18
   :flag-assert         #x900000018
-  ;; field p-user-data uses ~A with a signed load. 
+  ;; field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -13877,7 +13877,7 @@
   :method-count-assert 9
   :size-assert         #x18
   :flag-assert         #x900000018
-  ;; field p-user-data uses ~A with a signed load. 
+  ;; field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -13921,7 +13921,7 @@
   :method-count-assert 9
   :size-assert         #x14
   :flag-assert         #x900000014
-  ;; field p-user-data uses ~A with a signed load. 
+  ;; field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -13949,7 +13949,7 @@
   :method-count-assert 9
   :size-assert         #x10
   :flag-assert         #x900000010
-  ;; field p-user-data uses ~A with a signed load. 
+  ;; field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -13975,7 +13975,7 @@
   :method-count-assert 9
   :size-assert         #x14
   :flag-assert         #x900000014
-  ;; field p-user-data uses ~A with a signed load. 
+  ;; field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -13990,7 +13990,7 @@
   :method-count-assert 9
   :size-assert         #x14
   :flag-assert         #x900000014
-  ;; field p-user-data uses ~A with a signed load. 
+  ;; field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -14022,7 +14022,7 @@
   :method-count-assert 9
   :size-assert         #x70
   :flag-assert         #x900000070
-  ;; field p-audio-record-callback-data uses ~A with a signed load. field p-audio-play-callback-data uses ~A with a signed load. field p-video-record-callback-data uses ~A with a signed load. field p-video-play-callback-data uses ~A with a signed load. field p-custom-video-record-callback-data uses ~A with a signed load. field p-custom-video-play-callback-data uses ~A with a signed load. 
+  ;; field p-audio-record-callback-data uses ~A with a signed load. field p-audio-play-callback-data uses ~A with a signed load. field p-video-record-callback-data uses ~A with a signed load. field p-video-play-callback-data uses ~A with a signed load. field p-custom-video-record-callback-data uses ~A with a signed load. field p-custom-video-play-callback-data uses ~A with a signed load.
   )
 |#
 
@@ -14091,7 +14091,7 @@
   :method-count-assert 9
   :size-assert         #x164
   :flag-assert         #x900000164
-  ;; field p-local-connect-callback-data uses ~A with a signed load. field p-local-disconnect-callback-data uses ~A with a signed load. field p-remote-client-connect-callback-data uses ~A with a signed load. field p-remote-client-disconnect-callback-data uses ~A with a signed load. field p-host-change-callback-data uses ~A with a signed load. field p-system-status-callback-data uses ~A with a signed load. 
+  ;; field p-local-connect-callback-data uses ~A with a signed load. field p-local-disconnect-callback-data uses ~A with a signed load. field p-remote-client-connect-callback-data uses ~A with a signed load. field p-remote-client-disconnect-callback-data uses ~A with a signed load. field p-host-change-callback-data uses ~A with a signed load. field p-system-status-callback-data uses ~A with a signed load.
   )
 |#
 
@@ -14130,7 +14130,7 @@
   :method-count-assert 9
   :size-assert         #x40
   :flag-assert         #x900000040
-  ;; field connection-handle uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load.
   )
 |#
 
@@ -14155,7 +14155,7 @@
   :method-count-assert 9
   :size-assert         #x10
   :flag-assert         #x900000010
-  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -14182,7 +14182,7 @@
   :method-count-assert 9
   :size-assert         #x1c
   :flag-assert         #x90000001c
-  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -14201,7 +14201,7 @@
   :method-count-assert 9
   :size-assert         #x38
   :flag-assert         #x900000038
-  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -14217,7 +14217,7 @@
   :method-count-assert 9
   :size-assert         #x18
   :flag-assert         #x900000018
-  ;; field p-current-data uses ~A with a signed load. field p-last-update-data uses ~A with a signed load. 
+  ;; field p-current-data uses ~A with a signed load. field p-last-update-data uses ~A with a signed load.
   )
 |#
 
@@ -14231,7 +14231,7 @@
   :method-count-assert 9
   :size-assert         #x10
   :flag-assert         #x900000010
-  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -14246,7 +14246,7 @@
   :method-count-assert 9
   :size-assert         #x60
   :flag-assert         #x900000060
-  ;; field p-user-data uses ~A with a signed load. 
+  ;; field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -14261,7 +14261,7 @@
   :method-count-assert 9
   :size-assert         #x14
   :flag-assert         #x900000014
-  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -14275,7 +14275,7 @@
   :method-count-assert 9
   :size-assert         #x10
   :flag-assert         #x900000010
-  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -14287,7 +14287,7 @@
   :method-count-assert 9
   :size-assert         #x8
   :flag-assert         #x900000008
-  ;; field p-user-data uses ~A with a signed load. 
+  ;; field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -14300,7 +14300,7 @@
   :method-count-assert 9
   :size-assert         #xc
   :flag-assert         #x90000000c
-  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -14326,7 +14326,7 @@
   :method-count-assert 9
   :size-assert         #x48
   :flag-assert         #x900000048
-  ;; field connection-handle uses ~A with a signed load. field p-join-callback-data uses ~A with a signed load. field p-remote-client-event-callback-data uses ~A with a signed load. field p-smchange-callback-data uses ~A with a signed load. field p-ownership-update-callback-data uses ~A with a signed load. field p-ownership-request-callback-data uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load. field p-join-callback-data uses ~A with a signed load. field p-remote-client-event-callback-data uses ~A with a signed load. field p-smchange-callback-data uses ~A with a signed load. field p-ownership-update-callback-data uses ~A with a signed load. field p-ownership-request-callback-data uses ~A with a signed load.
   )
 |#
 
@@ -14485,7 +14485,7 @@
   :method-count-assert 9
   :size-assert         #x44
   :flag-assert         #x900000044
-  ;; field local-user-data uses ~A with a signed load. 
+  ;; field local-user-data uses ~A with a signed load.
   )
 |#
 
@@ -14497,7 +14497,7 @@
   :method-count-assert 9
   :size-assert         #x8
   :flag-assert         #x900000008
-  ;; field p-user-data uses ~A with a signed load. 
+  ;; field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -14536,7 +14536,7 @@
   :method-count-assert 9
   :size-assert         #x20
   :flag-assert         #x900000020
-  ;; field p-user-data uses ~A with a signed load. 
+  ;; field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -14549,7 +14549,7 @@
   :method-count-assert 9
   :size-assert         #xc
   :flag-assert         #x90000000c
-  ;; field connection-handle uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load.
   )
 |#
 
@@ -14563,7 +14563,7 @@
   :method-count-assert 9
   :size-assert         #x10
   :flag-assert         #x900000010
-  ;; field connection-handle uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load.
   )
 |#
 
@@ -14587,7 +14587,7 @@
   :method-count-assert 9
   :size-assert         #x10
   :flag-assert         #x900000010
-  ;; field connection-handle uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load.
   )
 |#
 
@@ -17869,7 +17869,7 @@
   :method-count-assert 9
   :size-assert         #x8
   :flag-assert         #x900000008
-  ;; field connection-handle uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load.
   )
 |#
 
@@ -17882,7 +17882,7 @@
   :method-count-assert 9
   :size-assert         #xc
   :flag-assert         #x90000000c
-  ;; field connection-handle uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load.
   )
 |#
 
@@ -17908,7 +17908,7 @@
   :method-count-assert 9
   :size-assert         #x40
   :flag-assert         #x900000040
-  ;; field my-chat-fwd-message-callback-user-data uses ~A with a signed load. field my-binary-fwd-message-callback-user-data uses ~A with a signed load. field my-add-to-buddy-list-fwd-confirmation-request-callback-user-data uses ~A with a signed load. field my-error-message-callback-user-data uses ~A with a signed load. field my-reassign-game-medius-world-idcallback-user-data uses ~A with a signed load. field p-system-message-callback-data uses ~A with a signed load. 
+  ;; field my-chat-fwd-message-callback-user-data uses ~A with a signed load. field my-binary-fwd-message-callback-user-data uses ~A with a signed load. field my-add-to-buddy-list-fwd-confirmation-request-callback-user-data uses ~A with a signed load. field my-error-message-callback-user-data uses ~A with a signed load. field my-reassign-game-medius-world-idcallback-user-data uses ~A with a signed load. field p-system-message-callback-data uses ~A with a signed load.
   )
 |#
 
@@ -17939,7 +17939,7 @@
   :method-count-assert 9
   :size-assert         #x2c
   :flag-assert         #x90000002c
-  ;; field my-chat-fwd-message-callback-user-data uses ~A with a signed load. field my-binary-fwd-message-callback-user-data uses ~A with a signed load. field my-add-to-buddy-list-fwd-confirmation-request-callback-user-data uses ~A with a signed load. field my-error-message-callback-user-data uses ~A with a signed load. field my-reassign-game-medius-world-idcallback-user-data uses ~A with a signed load. 
+  ;; field my-chat-fwd-message-callback-user-data uses ~A with a signed load. field my-binary-fwd-message-callback-user-data uses ~A with a signed load. field my-add-to-buddy-list-fwd-confirmation-request-callback-user-data uses ~A with a signed load. field my-error-message-callback-user-data uses ~A with a signed load. field my-reassign-game-medius-world-idcallback-user-data uses ~A with a signed load.
   )
 |#
 
@@ -18768,7 +18768,7 @@
   :method-count-assert 9
   :size-assert         #xc
   :flag-assert         #x90000000c
-  ;; field connection-handle uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load.
   )
 |#
 
@@ -18800,7 +18800,7 @@
   :method-count-assert 9
   :size-assert         #x44
   :flag-assert         #x900000044
-  ;; field my-server-create-game-callback-user-data uses ~A with a signed load. field my-server-create-game-with-attributes-user-data uses ~A with a signed load. field my-server-join-game-callback-user-data uses ~A with a signed load. field my-server-end-game-callback-user-data uses ~A with a signed load. field my-server-world-status-callback-user-data uses ~A with a signed load. field my-server-connect-games-user-data uses ~A with a signed load. 
+  ;; field my-server-create-game-callback-user-data uses ~A with a signed load. field my-server-create-game-with-attributes-user-data uses ~A with a signed load. field my-server-join-game-callback-user-data uses ~A with a signed load. field my-server-end-game-callback-user-data uses ~A with a signed load. field my-server-world-status-callback-user-data uses ~A with a signed load. field my-server-connect-games-user-data uses ~A with a signed load.
   )
 |#
 
@@ -18848,7 +18848,7 @@
   :method-count-assert 9
   :size-assert         #x78
   :flag-assert         #x900000078
-  ;; field p-system-message-callback-data uses ~A with a signed load. 
+  ;; field p-system-message-callback-data uses ~A with a signed load.
   )
 |#
 
@@ -18877,7 +18877,7 @@
   :method-count-assert 9
   :size-assert         #xc0
   :flag-assert         #x9000000c0
-  ;; field p-local-connect-callback-data uses ~A with a signed load. field p-local-disconnect-callback-data uses ~A with a signed load. field p-remote-client-connect-callback-data uses ~A with a signed load. field p-remote-client-disconnect-callback-data uses ~A with a signed load. field p-system-status-callback-data uses ~A with a signed load. 
+  ;; field p-local-connect-callback-data uses ~A with a signed load. field p-local-disconnect-callback-data uses ~A with a signed load. field p-remote-client-connect-callback-data uses ~A with a signed load. field p-remote-client-disconnect-callback-data uses ~A with a signed load. field p-system-status-callback-data uses ~A with a signed load.
   )
 |#
 
@@ -18969,7 +18969,7 @@
   :method-count-assert 9
   :size-assert         #xb8
   :flag-assert         #x9000000b8
-  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load. 
+  ;; field connection-handle uses ~A with a signed load. field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -18985,7 +18985,7 @@
   :method-count-assert 9
   :size-assert         #xb8
   :flag-assert         #x9000000b8
-  ;; field p-user-data uses ~A with a signed load. 
+  ;; field p-user-data uses ~A with a signed load.
   )
 |#
 
@@ -19109,7 +19109,7 @@
   :method-count-assert 9
   :size-assert         #x28
   :flag-assert         #x900000028
-  ;; field connect-handle uses ~A with a signed load. 
+  ;; field connect-handle uses ~A with a signed load.
   )
 |#
 
@@ -19140,7 +19140,7 @@
   :method-count-assert 9
   :size-assert         #x5c
   :flag-assert         #x90000005c
-  ;; field connect-handle uses ~A with a signed load. field connect-handle-mgcl uses ~A with a signed load. field connect-handle-muis uses ~A with a signed load. field callback-userdata uses ~A with a signed load. 
+  ;; field connect-handle uses ~A with a signed load. field connect-handle-mgcl uses ~A with a signed load. field connect-handle-muis uses ~A with a signed load. field callback-userdata uses ~A with a signed load.
   )
 |#
 
@@ -19706,7 +19706,7 @@
   :method-count-assert 10
   :size-assert         #xa8
   :flag-assert         #xa000000a8
-  ;; field handle is likely a value type. 
+  ;; field handle is likely a value type.
   (:methods
     (attack-info-method-9 () none) ;; 9 ;; (attack-info-method-9 (_type_ attack-info process-drawable process-drawable) none)
     )
@@ -19751,7 +19751,7 @@
   :method-count-assert 12
   :size-assert         #xa0
   :flag-assert         #xc000000a0
-  ;; field key uses ~A with a signed load. field expr uses ~A with a signed load. 
+  ;; field key uses ~A with a signed load. field expr uses ~A with a signed load.
   (:methods
     (new (symbol type) _type_) ;; 0 ;; (new (symbol type object process vector) _type_)
     (script-context-method-9 () none) ;; 9 ;; (eval! (_type_ pair) object)
@@ -19834,7 +19834,7 @@
   :method-count-assert 18
   :size-assert         #x8c
   :flag-assert         #x120000008c
-  ;; field on-running uses ~A with a signed load. field on-complete uses ~A with a signed load. 
+  ;; field on-running uses ~A with a signed load. field on-complete uses ~A with a signed load.
   (:methods
     (scene-method-16 () none) ;; 16 ;; (init-spool-by-scene! (_type_ spool-anim) spool-anim)
     (scene-method-17 () none) ;; 17 ;; (load-scene (_type_) scene)
@@ -19877,7 +19877,7 @@
   :method-count-assert 56
   :size-assert         #x1c8
   :flag-assert         #x38014001c8
-  ;; field user-data uses ~A with a 64-bit load. 
+  ;; field user-data uses ~A with a 64-bit load.
   (:methods
     (scene-player-method-50 () none) ;; 50
     (scene-player-method-51 () none) ;; 51
@@ -20008,7 +20008,7 @@
   :method-count-assert 9
   :size-assert         #x2c
   :flag-assert         #x90000002c
-  ;; field obj uses ~A with a signed load. 
+  ;; field obj uses ~A with a signed load.
   )
 |#
 
@@ -20088,7 +20088,7 @@
   :method-count-assert 16
   :size-assert         #xac
   :flag-assert         #x10000000ac
-  ;; field track-mode is likely a value type. 
+  ;; field track-mode is likely a value type.
   (:methods
     (new (symbol type) _type_) ;; 0 ;; (new (symbol type joint-mod-mode process-drawable int) _type_)
     (joint-mod-method-9 () none) ;; 9 ;; (mode-set! (_type_ joint-mod-mode) none)
@@ -20679,7 +20679,7 @@
   :method-count-assert 55
   :size-assert         #xc8
   :flag-assert         #x37000000c8
-  ;; field penetrate is likely a value type. field penetrate is likely a value type. 
+  ;; field penetrate is likely a value type. field penetrate is likely a value type.
   (:methods
     (new (symbol type) _type_) ;; 0 ;; (new (symbol type process-drawable collide-list-enum) _type_)
     (collide-shape-method-28 () none) ;; 28 ;; (move-by-vector! (_type_ vector) none)
@@ -20741,7 +20741,7 @@
   :method-count-assert 67
   :size-assert         #x1d8
   :flag-assert         #x43000001d8
-  ;; field penetrate is likely a value type. field penetrate is likely a value type. 
+  ;; field penetrate is likely a value type. field penetrate is likely a value type.
   (:methods
     (new (symbol type) _type_) ;; 0 ;; (new (symbol type process-drawable collide-list-enum) _type_)
     (collide-shape-moving-method-55 () none) ;; 55 ;; (find-ground (_type_ collide-query collide-spec float float float process) symbol)
@@ -20800,7 +20800,7 @@
   :method-count-assert 51
   :size-assert         #x1a4
   :flag-assert         #x33012001a4
-  ;; field userdata uses ~A with a 64-bit load. 
+  ;; field userdata uses ~A with a 64-bit load.
   (:methods
     (manipy-method-50 () none) ;; 50
     )
@@ -20860,7 +20860,7 @@
   :method-count-assert 19
   :size-assert         #x17c
   :flag-assert         #x1300f0017c
-  ;; field userdata uses ~A with a 64-bit load. 
+  ;; field userdata uses ~A with a 64-bit load.
   (:methods
     (part-tracker-method-9 () none) ;; 9
     (part-tracker-method-10 () none) ;; 10
@@ -20892,7 +20892,7 @@
   :method-count-assert 9
   :size-assert         #x38
   :flag-assert         #x900000038
-  ;; field userdata uses ~A with a 64-bit load. field mat-joint uses ~A with a signed load. 
+  ;; field userdata uses ~A with a 64-bit load. field mat-joint uses ~A with a signed load.
   )
 |#
 
@@ -20928,7 +20928,7 @@
   :method-count-assert 18
   :size-assert         #x140
   :flag-assert         #x1200b00140
-  ;; field userdata uses ~A with a 64-bit load. 
+  ;; field userdata uses ~A with a 64-bit load.
   (:methods
     (lightning-tracker-method-9 () none) ;; 9
     (lightning-tracker-method-10 () none) ;; 10
@@ -22046,7 +22046,7 @@
   :method-count-assert 9
   :size-assert         #x68
   :flag-assert         #x900000068
-  ;; field validator-params uses ~A with a signed load. 
+  ;; field validator-params uses ~A with a signed load.
   )
 |#
 
@@ -22106,7 +22106,7 @@
   :method-count-assert 60
   :size-assert         #x350
   :flag-assert         #x3c02c00350
-  ;; field mode-param2 uses ~A with a 64-bit load. field mode-param3 uses ~A with a 64-bit load. 
+  ;; field mode-param2 uses ~A with a 64-bit load. field mode-param3 uses ~A with a 64-bit load.
   (:methods
     (target-method-59 () none) ;; 59
     )
@@ -24275,7 +24275,7 @@
   :method-count-assert 9
   :size-assert         #x10
   :flag-assert         #x900000010
-  ;; field object uses ~A with a signed load. 
+  ;; field object uses ~A with a signed load.
   )
 |#
 
@@ -24479,7 +24479,7 @@
   :method-count-assert 9
   :size-assert         #x8c
   :flag-assert         #x90000008c
-  ;; field user-object uses ~A with a signed load. field control uses ~A with a signed load. 
+  ;; field user-object uses ~A with a signed load. field control uses ~A with a signed load.
   )
 |#
 
@@ -24959,7 +24959,7 @@
   :method-count-assert 9
   :size-assert         #x19
   :flag-assert         #x900000019
-  ;; field nav-mesh-link-search-node-status is likely a value type. 
+  ;; field nav-mesh-link-search-node-status is likely a value type.
   )
 |#
 
@@ -25139,7 +25139,7 @@
   :method-count-assert 47
   :size-assert         #x70
   :flag-assert         #x2f00000070
-  ;; field nav-mesh-flag is likely a value type. 
+  ;; field nav-mesh-flag is likely a value type.
   (:methods
     (nav-mesh-method-9 () none) ;; 9 ;; (debug-draw (_type_) none)
     (nav-mesh-method-10 () none) ;; 10 ;; (nav-mesh-method-10 (_type_ vector vector nav-poly) nav-poly)
@@ -26494,7 +26494,7 @@
   :method-count-assert 12
   :size-assert         #x28
   :flag-assert         #xc00000028
-  ;; field out uses ~A with a signed load. 
+  ;; field out uses ~A with a signed load.
   (:methods
     (new (symbol type) _type_) ;; 0 ;; (new (symbol type uint) _type_)
     (history-iterator-method-9 () none) ;; 9 ;; (frame-counter-delta (_type_ history-elt) time-frame)
@@ -27438,7 +27438,7 @@
   :method-count-assert 9
   :size-assert         #x140
   :flag-assert         #x900000140
-  ;; field ra uses ~A with a signed load. field dummy0 uses ~A with a signed load. field dummy1 uses ~A with a signed load. field b-spfic uses ~A with a signed load. field l-spfic uses ~A with a signed load. 
+  ;; field ra uses ~A with a signed load. field dummy0 uses ~A with a signed load. field dummy1 uses ~A with a signed load. field b-spfic uses ~A with a signed load. field l-spfic uses ~A with a signed load.
   )
 |#
 
@@ -29014,7 +29014,7 @@
   :method-count-assert 9
   :size-assert         #x1c
   :flag-assert         #x90000001c
-  ;; field parm0 uses ~A with a signed load. field parm1 uses ~A with a signed load. 
+  ;; field parm0 uses ~A with a signed load. field parm1 uses ~A with a signed load.
   )
 |#
 
@@ -29042,7 +29042,7 @@
   :method-count-assert 9
   :size-assert         #x1c
   :flag-assert         #x90000001c
-  ;; field track-val uses ~A with a signed load. field val-parm0 uses ~A with a signed load. field val-parm1 uses ~A with a signed load. 
+  ;; field track-val uses ~A with a signed load. field val-parm0 uses ~A with a signed load. field val-parm1 uses ~A with a signed load.
   )
 |#
 
@@ -29589,7 +29589,7 @@
   :method-count-assert 38
   :size-assert         #xac
   :flag-assert         #x26000000ac
-  ;; field cloth-flag is likely a value type. 
+  ;; field cloth-flag is likely a value type.
   (:methods
     (cloth-system-method-16 () none) ;; 16 ;; (initialize-cloth-system! (_type_ cloth-params) none)
     (cloth-system-method-17 () none) ;; 17 ;; (debug-draw-spheres (_type_) none)
@@ -29627,7 +29627,7 @@
   :method-count-assert 38
   :size-assert         #x110
   :flag-assert         #x2600000110
-  ;; field cloth-flag is likely a value type. 
+  ;; field cloth-flag is likely a value type.
   )
 |#
 
@@ -30763,7 +30763,7 @@
   :method-count-assert 41
   :size-assert         #x130
   :flag-assert         #x2900000130
-  ;; field rigid-body-flag is likely a value type. 
+  ;; field rigid-body-flag is likely a value type.
   (:methods
     (new (symbol type) _type_) ;; 0 ;; (new (symbol type process) _type_)
     (rigid-body-control-method-9 () none) ;; 9 ;; (rigid-body-control-method-9 (_type_ collide-shape-moving float) none)
@@ -30864,7 +30864,7 @@
   :method-count-assert 89
   :size-assert         #x120
   :flag-assert         #x5900900120
-  ;; field rigid-body-object-flag is likely a value type. 
+  ;; field rigid-body-object-flag is likely a value type.
   (:methods
     (rigid-body-object-method-59 () none) ;; 59
     (rigid-body-object-method-60 () none) ;; 60
@@ -33184,7 +33184,7 @@
   :method-count-assert 9
   :size-assert         #x40
   :flag-assert         #x900000040
-  ;; field rigid-body-surface-flag is likely a value type. 
+  ;; field rigid-body-surface-flag is likely a value type.
   )
 |#
 
@@ -33748,7 +33748,7 @@
   :method-count-assert 204
   :size-assert         #x859
   :flag-assert         #xcc07d00859
-  ;; field vehicle-flag is likely a value type. 
+  ;; field vehicle-flag is likely a value type.
   (:methods
     (vehicle-method-89 () none) ;; 89 ;; (init-reverse (_type_ vehicle-controls) none)
     (vehicle-method-90 () none) ;; 90 ;; (control-hook-ai (_type_ vehicle-controls) none)
@@ -34313,7 +34313,7 @@
   :method-count-assert 9
   :size-assert         #x1e
   :flag-assert         #x90000001e
-  ;; field impact-callback-params uses ~A with a signed load. 
+  ;; field impact-callback-params uses ~A with a signed load.
   )
 |#
 
@@ -36356,7 +36356,7 @@
   :method-count-assert 9
   :size-assert         #xc
   :flag-assert         #x90000000c
-  ;; field extra uses ~A with a signed load. field extra-object uses ~A with a signed load. 
+  ;; field extra uses ~A with a signed load. field extra-object uses ~A with a signed load.
   )
 |#
 
@@ -36371,7 +36371,7 @@
   :method-count-assert 9
   :size-assert         #x84
   :flag-assert         #x900000084
-  ;; field extra uses ~A with a signed load. field extra-object uses ~A with a signed load. 
+  ;; field extra uses ~A with a signed load. field extra-object uses ~A with a signed load.
   )
 |#
 
@@ -37799,7 +37799,7 @@
   :method-count-assert 22
   :size-assert         #xa0
   :flag-assert         #x16001000a0
-  ;; field connect-handle uses ~A with a signed load. 
+  ;; field connect-handle uses ~A with a signed load.
   (:methods
     (aux-voice-mgr-method-9 () none) ;; 9
     (aux-voice-mgr-method-10 () none) ;; 10
@@ -38266,7 +38266,7 @@
   :method-count-assert 9
   :size-assert         #x144
   :flag-assert         #x900000144
-  ;; field private uses ~A with a signed load. 
+  ;; field private uses ~A with a signed load.
   )
 |#
 
@@ -39078,7 +39078,7 @@
   :method-count-assert 9
   :size-assert         #x14
   :flag-assert         #x900000014
-  ;; field param2 uses ~A with a signed load. 
+  ;; field param2 uses ~A with a signed load.
   )
 |#
 
@@ -39469,7 +39469,7 @@
   :method-count-assert 16
   :size-assert         #xac
   :flag-assert         #x10000000ac
-  ;; field track-mode is likely a value type. 
+  ;; field track-mode is likely a value type.
   )
 |#
 
@@ -40779,7 +40779,7 @@
   :method-count-assert 13
   :size-assert         #x30
   :flag-assert         #xd00000030
-  ;; field on-enter uses ~A with a signed load. field on-inside uses ~A with a signed load. field on-exit uses ~A with a signed load. 
+  ;; field on-enter uses ~A with a signed load. field on-inside uses ~A with a signed load. field on-exit uses ~A with a signed load.
   (:methods
     (new (symbol type) _type_) ;; 0 ;; (new (symbol type) _type_)
     (editable-region-method-9 () none) ;; 9 ;; (save-region! (_type_ editable-array int int) symbol)
@@ -52937,6 +52937,3 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; speech-ximon                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
