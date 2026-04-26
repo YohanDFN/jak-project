@@ -325,31 +325,31 @@ engine_files = {
     "rigid-body-object": "physics",
     "spartacus": "util",
     "attackable-hash": "target",
-    "helmet": "common-objs",
-    "driver": "common-objs/driver",
-    "driver-jak": "common-objs/driver",
-    "driver-ashelin": "common-objs/driver",
-    "driver-razer": "common-objs/driver",
-    "driver-klever": "common-objs/driver",
-    "driver-kiera": "common-objs/driver",
-    "driver-thug-a": "common-objs/driver",
-    "driver-thug-b": "common-objs/driver",
-    "driver-thug-c": "common-objs/driver",
-    "driver-taryn": "common-objs/driver",
-    "driver-torn": "common-objs/driver",
-    "driver-sig": "common-objs/driver",
-    "driver-ur-86": "common-objs/driver",
-    "driver-kaeden": "common-objs/driver",
-    "driver-rayn": "common-objs/driver",
-    "driver-ratchet": "common-objs/driver",
-    "driver-jaka": "common-objs/driver",
-    "driver-jakb": "common-objs/driver",
-    "driver-jakc": "common-objs/driver",
-    "driver-daxter": "common-objs/driver",
-    "driver-gtblitz": "common-objs/driver",
-    "driver-pecker": "common-objs/driver",
-    "driver-ximon": "common-objs/driver",
-    "driver-osmo": "common-objs/driver",
+    "helmet": "common-obs",
+    "driver": "common-obs/driver",
+    "driver-jak": "common-obs/driver",
+    "driver-ashelin": "common-obs/driver",
+    "driver-razer": "common-obs/driver",
+    "driver-klever": "common-obs/driver",
+    "driver-kiera": "common-obs/driver",
+    "driver-thug-a": "common-obs/driver",
+    "driver-thug-b": "common-obs/driver",
+    "driver-thug-c": "common-obs/driver",
+    "driver-taryn": "common-obs/driver",
+    "driver-torn": "common-obs/driver",
+    "driver-sig": "common-obs/driver",
+    "driver-ur-86": "common-obs/driver",
+    "driver-kaeden": "common-obs/driver",
+    "driver-rayn": "common-obs/driver",
+    "driver-ratchet": "common-obs/driver",
+    "driver-jaka": "common-obs/driver",
+    "driver-jakb": "common-obs/driver",
+    "driver-jakc": "common-obs/driver",
+    "driver-daxter": "common-obs/driver",
+    "driver-gtblitz": "common-obs/driver",
+    "driver-pecker": "common-obs/driver",
+    "driver-ximon": "common-obs/driver",
+    "driver-osmo": "common-obs/driver",
     "speech-jak": "sound/speech",
     "speech-daxter": "sound/speech",
     "speech-pecker": "sound/speech",
@@ -366,14 +366,16 @@ engine_files = {
     "vehicle-manager": "vehicle",
     "vehicle-hud": "vehicle",
     "vehicle-net": "vehicle",
-    "construction-obs-h": "common-objs",
-    "daxter": "common-objs",
+    "construction-obs-h": "common-obs",
+    "daxter": "common-obs",
     "wvehicle-weapons-debug": "vehicle",
     "spartacus-editor": "util",
 }
 
 path_overrides = {
     "jungle-shared": "levels/haven/jungle",
+    "garage-obs": "levels/garage",
+    "garage-part": "levels/garage",
 }
 
 
@@ -922,7 +924,7 @@ def level_name(file_meta):
         or dgos == ["GTBLEV"]
         or dgos == ["CHEEL", "RAZVL", "THCVL3"]
     ):
-        return "vehicles-characters"
+        return "engine/sound/speech"
     elif (
         dgos == ["COL", "COLX"]
         or dgos == ["COLICTF"]
@@ -1538,9 +1540,9 @@ def level_name(file_meta):
         or dgos == ["GARAGEB", "MENU2"]
         or dgos == ["GARAGE", "GARAGEB", "MENU2"]
     ):
-        return "ui/menu"
+        return "engine/ui/menu"
     elif dgos == ["MENUMAP"] or dgos == ["GARAGE", "MENU2"]:
-        return "ui/menu/map"
+        return "engine/ui/menu/map"
     elif (
         dgos == ["ATL", "ATX"]
         or dgos == ["ATL"]

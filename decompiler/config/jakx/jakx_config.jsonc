@@ -128,10 +128,11 @@
   "inputs_file": "decompiler/config/jakx/ntsc_v1/inputs.jsonc",
   "art_info_file": "decompiler/config/jakx/ntsc_v1/art_info.jsonc",
   "import_deps_file": "decompiler/config/jakx/ntsc_v1/import_deps.jsonc",
-  // "art_group_dump_file": "decompiler/config/ntsc_v1/art-group-info.min.json",
-  // "joint_node_dump_file": "decompiler/config/ntsc_v1/joint-node-info.min.json",
-  // "tex_dump_file": "decompiler/config/ntsc_v1/tex-info.min.json",
-  // "part_group_table_dump_file": "decompiler/config/jak3/ntsc_v1/part-groups.min.json",
+  "art_group_dump_file": "decompiler/config/jakx/ntsc_v1/art-group-info.min.json",
+  "joint_node_dump_file": "decompiler/config/jakx/ntsc_v1/joint-node-info.min.json",
+  "tex_dump_file": "decompiler/config/jakx/ntsc_v1/tex-info.min.json",
+  // TODO - regenerate once sparticle is decompiled
+  // "part_group_table_dump_file": "decompiler/config/jakx/ntsc_v1/part-groups.min.json",
   "process_stack_size_file": "decompiler/config/jakx/ntsc_v1/process_stack_size_overrides.jsonc",
   "all_types_file": "decompiler/config/jakx/all-types.gc",
 

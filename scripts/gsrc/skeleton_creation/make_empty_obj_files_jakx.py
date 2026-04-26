@@ -7,7 +7,7 @@ from pathlib import Path
 
 file_list = None
 
-with open("../../../goal_src/jakx/build/all_objs.json", "r") as f:
+with open("./goal_src/jakx/build/all_objs.json", "r") as f:
     file_list = json.load(f)
 
 
@@ -26,6 +26,7 @@ def is_code_file(name, dgos):
         and not name.startswith("tpage-")
         and not name.endswith("COMMON")
         and not dgos[0].lower() == name
+        and not dgos[0].lower() == "NO-XGO"
         and not name.endswith("-tx")
     )
 
@@ -50,4 +51,4 @@ def make_file(root, path, name, name_in_dgo, dgos, version):
 
 
 for x in file_list:
-    make_file("../../../goal_src/jakx", x[4], x[0], x[1], x[3], x[2])
+    make_file("./goal_src/jakx", x[4], x[0], x[1], x[3], x[2])
